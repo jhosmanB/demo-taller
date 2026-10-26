@@ -1,0 +1,718 @@
+/* =========================================================
+   PORTAL PÚBLICO · CONSULTA DEL CLIENTE
+   Diseño pensado primero para celular y ampliado en tablet.
+   ========================================================= */
+
+body.portal {
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 420px at 100% -10%, rgba(249, 115, 22, 0.12), transparent 62%),
+    var(--gris-100);
+}
+
+.portal .icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+.portal-cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, #111827, #1F2937);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(17, 24, 39, 0.18);
+}
+
+.portal-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.portal-marca .logo-taller {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.portal-marca .logo-taller svg {
+  width: 21px;
+  height: 21px;
+}
+
+.portal-marca-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.portal-marca-nombre {
+  overflow: hidden;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.portal-marca-sub {
+  margin-top: 3px;
+  color: #FB923C;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.portal-telefono {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.portal-telefono:hover {
+  background: rgba(255, 255, 255, 0.14);
+  text-decoration: none;
+}
+
+.portal-telefono svg {
+  width: 15px;
+  height: 15px;
+  color: #4ADE80;
+}
+
+.portal-telefono span {
+  display: none;
+}
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+.portal-contenido {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 22px 16px 42px;
+}
+
+.portal-heroe {
+  margin-bottom: 18px;
+}
+
+.portal-etiqueta {
+  display: block;
+  color: var(--naranja-oscuro);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.portal-heroe h1 {
+  margin-top: 4px;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.portal-heroe p {
+  max-width: 54ch;
+  margin-top: 9px;
+  color: var(--texto-suave);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   FORMULARIO DE CONSULTA
+   ========================================================= */
+.portal-formulario {
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.portal-formulario h2 {
+  margin-bottom: 14px;
+  font-size: 21px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.portal-formulario .grid-2 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#consulta-ficha,
+#consulta-placa {
+  padding: 11px 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#consulta-ficha::placeholder,
+#consulta-placa::placeholder {
+  font-weight: 600;
+  letter-spacing: 1.2px;
+}
+
+.portal-btn-consultar {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.portal-ayuda {
+  margin-top: 10px;
+  color: var(--texto-suave);
+  font-size: 11.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.portal-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #FCA5A5;
+  border-left: 4px solid var(--rojo);
+  border-radius: 8px;
+  background: var(--rojo-claro);
+  color: #991B1B;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.portal-error .icono {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.portal-error .icono svg {
+  width: 16px;
+  height: 16px;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--gris-100);
+  color: var(--gris-400);
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   RESULTADO
+   ========================================================= */
+.portal-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-margin-top: 84px;
+  animation: portal-aparecer 260ms ease both;
+}
+
+@keyframes portal-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portal-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 1px solid #FDE68A;
+  border-left: 4px solid #F59E0B;
+  border-radius: 10px;
+  background: #FFFBEB;
+  color: #92400E;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.portal-aviso .icono {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.portal-aviso .icono svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Cabecera de la ficha */
+.portal-ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.portal-ficha-cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-top: 4px solid var(--naranja);
+  border-radius: var(--radio);
+  background: linear-gradient(135deg, #111827, #1F2937);
+  color: #fff;
+  box-shadow: var(--sombra-media);
+}
+
+.portal-ficha-cabecera .portal-etiqueta {
+  color: #FB923C;
+}
+
+.portal-ficha-cabecera h2 {
+  margin-top: 2px;
+  color: #fff;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: 0.5px;
+}
+
+.portal-ficha-cabecera h2:focus {
+  outline: none;
+}
+
+.portal-ficha-cliente {
+  margin-top: 5px;
+  color: #D1D5DB;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.portal-ficha-estado {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.portal-actualizado {
+  color: #9CA3AF;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+/* Bloques de información */
+.portal-bloque {
+  padding: 16px;
+}
+
+.portal-bloque h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 13px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--gris-100);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.portal-bloque h3 .icono {
+  color: var(--naranja-oscuro);
+}
+
+.portal-bloque h3 .icono svg {
+  width: 17px;
+  height: 17px;
+}
+
+.portal-bloque-ayuda {
+  margin: -5px 0 11px;
+  color: var(--texto-suave);
+  font-size: 11px;
+}
+
+/* Stepper adaptado al ancho del celular */
+.portal-stepper .stepper {
+  margin-top: 2px;
+}
+
+.portal-stepper .stepper-paso {
+  gap: 5px;
+}
+
+.portal-stepper .stepper-paso::before {
+  top: 12px;
+}
+
+.portal-stepper .stepper-punto {
+  width: 24px;
+  height: 24px;
+  font-size: 9.5px;
+}
+
+.portal-stepper .stepper-punto .icono svg {
+  width: 12px;
+  height: 12px;
+}
+
+.portal-stepper .stepper-texto {
+  max-width: 62px;
+  font-size: 8.5px;
+  letter-spacing: 0;
+}
+
+.portal-stepper .stepper-aviso {
+  margin-top: 10px;
+  font-size: 10.5px;
+}
+
+.portal-fechas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--gris-100);
+}
+
+.portal-fechas p,
+.portal-datos p {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.portal-fechas span,
+.portal-datos span {
+  color: var(--texto-suave);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.portal-fechas strong,
+.portal-datos strong {
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Datos del vehículo */
+.portal-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.portal-placa {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--carbon-900);
+  color: #fff !important;
+  font-size: 11px !important;
+  letter-spacing: 1.2px;
+}
+
+/* Servicios */
+.portal-tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.portal-tabla th {
+  padding: 0 0 7px;
+  border-bottom: 1px solid var(--gris-200);
+  color: var(--texto-suave);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.portal-tabla td {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--gris-100);
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  vertical-align: top;
+}
+
+.portal-tabla tfoot td {
+  padding-top: 11px;
+  border-bottom: 0;
+  color: var(--carbon-900);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.portal-tabla tfoot td:first-child {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.portal-der {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.portal-pago {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px dashed var(--gris-200);
+}
+
+/* Fotos */
+.portal-galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 8px;
+}
+
+.portal-foto {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 9px;
+  background: var(--carbon-900);
+  cursor: zoom-in;
+}
+
+.portal-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transicion);
+}
+
+.portal-foto:hover img,
+.portal-foto:focus-visible img {
+  transform: scale(1.04);
+}
+
+/* Acciones */
+.portal-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 2px;
+}
+
+.portal-acciones .btn {
+  width: 100%;
+}
+
+.portal-nota-demo {
+  color: var(--gris-400);
+  font-size: 10px;
+  text-align: center;
+}
+
+/* =========================================================
+   PIE
+   ========================================================= */
+.portal-pie {
+  padding: 22px 16px 30px;
+  border-top: 1px solid var(--borde);
+  background: #fff;
+  color: var(--texto-suave);
+  font-size: 11.5px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.portal-pie p + p {
+  margin-top: 3px;
+}
+
+.portal-pie a {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--naranja-oscuro);
+  font-weight: 700;
+}
+
+.portal-pie-nota {
+  margin-top: 12px;
+  color: var(--gris-400);
+  font-size: 10px;
+}
+
+/* =========================================================
+   PANTALLAS MÁS GRANDES
+   ========================================================= */
+@media (min-width: 560px) {
+  .portal-cabecera {
+    padding: 13px 24px;
+  }
+
+  .portal-marca-nombre {
+    font-size: 21px;
+  }
+
+  .portal-telefono span {
+    display: inline;
+  }
+
+  .portal-contenido {
+    padding: 30px 24px 52px;
+  }
+
+  .portal-heroe h1 {
+    font-size: 46px;
+  }
+
+  .portal-heroe p {
+    font-size: 14px;
+  }
+
+  .portal-formulario {
+    padding: 22px 24px;
+  }
+
+  .portal-formulario .grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portal-ficha-cabecera {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 22px;
+  }
+
+  .portal-ficha-estado {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .portal-ficha-cabecera h2 {
+    font-size: 44px;
+  }
+
+  .portal-bloque {
+    padding: 18px 20px 20px;
+  }
+
+  .portal-fechas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portal-acciones {
+    flex-direction: row;
+  }
+
+  .portal-acciones .btn {
+    flex: 1;
+  }
+}
+
+@media (min-width: 760px) {
+  .portal-stepper .stepper-texto {
+    max-width: 78px;
+    font-size: 9.5px;
+  }
+
+  .portal-stepper .stepper-punto {
+    width: 28px;
+    height: 28px;
+    font-size: 10.5px;
+  }
+
+  .portal-stepper .stepper-paso::before {
+    top: 14px;
+  }
+}
+
+/* =========================================================
+   IMPRESIÓN Y MOVIMIENTO REDUCIDO
+   ========================================================= */
+@media print {
+  body.portal {
+    background: #fff;
+  }
+
+  .portal-cabecera,
+  .portal-heroe,
+  .portal-formulario,
+  .portal-acciones,
+  .portal-pie,
+  .portal-aviso,
+  .toasts {
+    display: none !important;
+  }
+
+  .portal-contenido {
+    max-width: none;
+    padding: 0;
+  }
+
+  .portal-resultado {
+    gap: 8px;
+  }
+
+  .portal-ficha-cabecera {
+    background: #111827 !important;
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+
+  .portal-bloque {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-resultado {
+    animation: none;
+  }
+
+  .portal-foto img {
+    transition: none;
+  }
+}

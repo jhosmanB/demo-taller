@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taller Mecánico Demo · Agenda y Órdenes</title>
+  <meta name="description" content="Demo de gestión para taller automotriz: agenda, órdenes de trabajo y consulta para clientes.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23F97316'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/agenda.css">
+  <link rel="stylesheet" href="css/ordenes.css">
+</head>
+<body>
+  <a class="salto-contenido" href="#contenido-principal">Saltar al contenido principal</a>
+
+  <div class="app" id="app">
+    <!-- ================= MENÚ LATERAL ================= -->
+    <aside class="sidebar" id="sidebar" aria-label="Menú principal">
+      <div class="sidebar-marca">
+        <div class="logo-taller" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </div>
+        <div class="marca-texto">
+          <span class="marca-nombre" id="marca-nombre">Taller Mecánico</span>
+          <span class="marca-sub">Demo · Gestión</span>
+        </div>
+        <button type="button" class="sidebar-cerrar" id="btn-cerrar-menu" aria-label="Cerrar menú">✕</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="sidebar-etiqueta">Operación</span>
+        <button type="button" class="nav-item activo" data-vista="agenda">
+          <span class="nav-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </span>
+          <span class="nav-texto">Agenda</span>
+          <span class="nav-badge" id="nav-badge-eventos">0</span>
+        </button>
+        <button type="button" class="nav-item" data-vista="ordenes">
+          <span class="nav-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg>
+          </span>
+          <span class="nav-texto">Órdenes</span>
+          <span class="nav-badge" id="nav-badge-ordenes">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-datos">
+        <span class="sidebar-etiqueta">Datos de la demo</span>
+        <button type="button" class="sidebar-accion" id="btn-exportar-datos">
+          <span class="sidebar-accion-icono">↓</span> Exportar JSON
+        </button>
+        <button type="button" class="sidebar-accion" id="btn-importar-datos">
+          <span class="sidebar-accion-icono">↑</span> Importar JSON
+        </button>
+        <button type="button" class="sidebar-accion sidebar-accion-peligro" id="btn-restablecer-demo">
+          <span class="sidebar-accion-icono">↻</span> Restablecer demo
+        </button>
+        <input type="file" id="input-importar" accept="application/json,.json" hidden>
+      </div>
+
+      <div class="sidebar-pie">
+        <p>Los datos se guardan únicamente en este navegador.</p>
+        <a href="consulta.html" target="_blank" rel="noopener">Abrir portal del cliente ↗</a>
+      </div>
+    </aside>
+    <div class="sidebar-fondo" id="sidebar-fondo" aria-hidden="true"></div>
+
+    <div class="app-contenido">
+      <!-- ================= BARRA SUPERIOR ================= -->
+      <header class="topbar">
+        <button type="button" class="btn-menu" id="btn-abrir-menu" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="topbar-texto">
+          <p class="topbar-miga" id="topbar-miga">Operación / Agenda</p>
+          <h1 id="topbar-titulo">Agenda del taller</h1>
+        </div>
+        <div class="topbar-derecha">
+          <span class="chip-fecha" id="chip-fecha-hoy">Hoy</span>
+          <span class="chip-demo"><span class="chip-demo-punto"></span> Demo local</span>
+        </div>
+      </header>
+
+      <main id="contenido-principal" class="contenido">
+        <!-- ============================================================
+             VISTA AGENDA
+             ============================================================ -->
+        <section id="vista-agenda" class="vista" aria-label="Agenda del taller">
+          <div class="agenda-layout">
+            <div class="agenda-principal">
+              <div class="tarjeta agenda-barra">
+                <div class="agenda-nav">
+                  <button type="button" class="btn btn-secundario btn-hoy" id="btn-agenda-hoy">Hoy</button>
+                  <div class="grupo-flechas">
+                    <button type="button" class="btn-icono" id="btn-agenda-anterior" aria-label="Período anterior">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button type="button" class="btn-icono" id="btn-agenda-siguiente" aria-label="Período siguiente">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                  </div>
+                  <h2 class="agenda-titulo-periodo" id="agenda-titulo-periodo">Agenda</h2>
+                </div>
+                <div class="agenda-acciones">
+                  <button type="button" class="btn btn-conflictos" id="btn-ver-conflictos" title="Ver eventos superpuestos">
+                    <span aria-hidden="true">⚠</span>
+                    <span id="contador-conflictos">0 conflictos</span>
+                  </button>
+                  <div class="selector-vista" role="group" aria-label="Vista del calendario">
+                    <button type="button" class="vista-btn activo" data-vista-calendario="mes">Mes</button>
+                    <button type="button" class="vista-btn" data-vista-calendario="semana">Semana</button>
+                    <button type="button" class="vista-btn" data-vista-calendario="dia">Día</button>
+                  </div>
+                  <button type="button" class="btn btn-primario" id="btn-crear-evento">
+                    <span aria-hidden="true">＋</span> Crear evento
+                  </button>
+                </div>
+              </div>
+
+              <div id="agenda-contenido" class="agenda-contenido"></div>
+            </div>
+
+            <aside class="agenda-lateral" aria-label="Panel de la agenda">
+              <div class="tarjeta mini-calendario">
+                <div class="mini-cabecera">
+                  <button type="button" class="btn-icono btn-icono-sm" id="btn-mini-anterior" aria-label="Mes anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                  </button>
+                  <strong id="mini-titulo">Mes</strong>
+                  <button type="button" class="btn-icono btn-icono-sm" id="btn-mini-siguiente" aria-label="Mes siguiente">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                </div>
+                <div id="mini-calendario" class="mini-grid"></div>
+              </div>
+
+              <div class="tarjeta leyenda">
+                <div class="tarjeta-cabecera">
+                  <h3>Tipos de evento</h3>
+                  <span>Mostrar / ocultar</span>
+                </div>
+                <div id="leyenda-tipos" class="leyenda-lista"></div>
+              </div>
+
+              <div class="tarjeta panel-conflictos">
+                <div class="tarjeta-cabecera">
+                  <h3>Conflictos</h3>
+                  <span class="badge-conflictos" id="badge-conflictos">0</span>
+                </div>
+                <div id="lista-conflictos-lateral" class="lista-conflictos-lateral"></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             VISTA ÓRDENES: LISTADO
+             ============================================================ -->
+        <section id="vista-ordenes" class="vista oculta" aria-label="Órdenes de trabajo">
+          <div id="ordenes-listado">
+            <div class="seccion-cabecera">
+              <div>
+                <p class="seccion-etiqueta">Recepción y seguimiento</p>
+                <h2>Órdenes de trabajo</h2>
+                <p class="seccion-descripcion">Gestioná el ingreso del vehículo, los servicios, el estado y la entrega.</p>
+              </div>
+              <button type="button" class="btn btn-primario" id="btn-nueva-orden">
+                <span aria-hidden="true">＋</span> Nueva orden de trabajo
+              </button>
+            </div>
+
+            <div id="ordenes-estadisticas" class="ordenes-estadisticas"></div>
+
+            <div class="tarjeta barra-filtros">
+              <div class="campo-busqueda">
+                <span class="campo-busqueda-icono" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+                <label class="solo-lectores" for="buscar-ordenes">Buscar órdenes</label>
+                <input type="search" id="buscar-ordenes" placeholder="Buscar por ficha, cliente o placa…" autocomplete="off">
+              </div>
+              <label class="filtro-estado" for="filtro-estado">
+                <span>Estado</span>
+                <select id="filtro-estado">
+                  <option value="todos">Todos los estados</option>
+                  <option value="recibido">Recibido</option>
+                  <option value="diagnostico">Diagnóstico</option>
+                  <option value="en_proceso">En proceso</option>
+                  <option value="esperando_repuestos">Esperando repuestos</option>
+                  <option value="control_calidad">Control de calidad</option>
+                  <option value="terminado">Terminado</option>
+                  <option value="entregado">Entregado</option>
+                </select>
+              </label>
+              <span class="conteo-resultados" id="resultado-conteo"></span>
+            </div>
+
+            <div class="tarjeta tabla-contenedor">
+              <table class="tabla-ordenes">
+                <thead>
+                  <tr>
+                    <th>N° de ficha</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Placa</th>
+                    <th>Vehículo</th>
+                    <th class="columna-total">Total</th>
+                    <th>Estado</th>
+                    <th class="columna-acciones">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-ordenes"></tbody>
+              </table>
+              <div id="ordenes-vacio" class="estado-vacio oculto">
+                <div class="estado-vacio-icono">🔍</div>
+                <h3>No hay órdenes con esos filtros</h3>
+                <p>Probá con otra búsqueda o creá una nueva orden de trabajo.</p>
+                <button type="button" class="btn btn-primario" id="btn-nueva-orden-vacio">Nueva orden</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================================
+               VISTA ÓRDENES: FORMULARIO
+               ============================================================ -->
+          <div id="ordenes-formulario" class="oculto">
+            <div class="form-cabecera">
+              <button type="button" class="btn-icono btn-volver" id="btn-volver-ordenes" aria-label="Volver al listado">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+              </button>
+              <div class="form-cabecera-texto">
+                <p class="seccion-etiqueta" id="form-miga-ficha">Órdenes / Nueva</p>
+                <h2 id="titulo-form-orden">Nueva orden de trabajo</h2>
+              </div>
+              <div class="form-acciones">
+                <button type="button" class="btn btn-secundario" id="btn-imprimir-orden">Imprimir</button>
+                <button type="button" class="btn btn-whatsapp" id="btn-whatsapp-orden">WhatsApp</button>
+                <button type="button" class="btn btn-secundario" id="btn-agenda-orden">Programar en agenda</button>
+                <button type="button" class="btn btn-peligro-suave" id="btn-eliminar-orden">Eliminar</button>
+              </div>
+            </div>
+
+            <div id="errores-orden" class="errores-formulario oculto" role="alert"></div>
+
+            <form id="form-orden" novalidate>
+              <input type="hidden" id="orden-original" value="">
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-datos-generales">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">01</span>
+                  <div>
+                    <h3 id="titulo-datos-generales">Datos generales</h3>
+                    <p>Ficha, fecha de recepción y condiciones comerciales.</p>
+                  </div>
+                </div>
+                <div class="grid-campos grid-5">
+                  <div class="campo">
+                    <label for="orden-ficha">N° de ficha</label>
+                    <input type="text" id="orden-ficha" readonly value="Se asigna al guardar">
+                  </div>
+                  <div class="campo">
+                    <label for="orden-fecha">Fecha <span class="obligatorio">*</span></label>
+                    <input type="date" id="orden-fecha" required>
+                  </div>
+                  <div class="campo">
+                    <label for="orden-hora">Hora <span class="obligatorio">*</span></label>
+                    <input type="time" id="orden-hora" required>
+                  </div>
+                  <div class="campo">
+                    <label for="orden-forma-pago">Forma de pago</label>
+                    <select id="orden-forma-pago">
+                      <option value="contado">Contado</option>
+                      <option value="credito">Crédito</option>
+                    </select>
+                  </div>
+                  <div class="campo">
+                    <label for="orden-documento">Documento</label>
+                    <select id="orden-documento">
+                      <option value="factura">Factura</option>
+                      <option value="nota">Nota de venta</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-datos-cliente">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">02</span>
+                  <div>
+                    <h3 id="titulo-datos-cliente">Datos del cliente</h3>
+                    <p>Información de contacto y facturación.</p>
+                  </div>
+                </div>
+                <div class="grid-campos grid-4">
+                  <div class="campo campo-span-2">
+                    <label for="cliente-nombre">Nombre y apellido o razón social <span class="obligatorio">*</span></label>
+                    <input type="text" id="cliente-nombre" maxlength="120" autocomplete="name" required>
+                  </div>
+                  <div class="campo">
+                    <label for="cliente-nit">NIT / CI</label>
+                    <input type="text" id="cliente-nit" maxlength="20" inputmode="numeric">
+                  </div>
+                  <div class="campo">
+                    <label for="cliente-celular">Celular <span class="obligatorio">*</span></label>
+                    <input type="tel" id="cliente-celular" maxlength="20" autocomplete="tel" required>
+                  </div>
+                  <div class="campo campo-span-2">
+                    <label for="cliente-direccion">Dirección</label>
+                    <input type="text" id="cliente-direccion" maxlength="160" autocomplete="street-address">
+                  </div>
+                  <div class="campo">
+                    <label for="cliente-telefono">Teléfono fijo</label>
+                    <input type="tel" id="cliente-telefono" maxlength="20">
+                  </div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-datos-vehiculo">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">03</span>
+                  <div>
+                    <h3 id="titulo-datos-vehiculo">Datos del vehículo</h3>
+                    <p>Identificación, kilometraje y estado de recepción.</p>
+                  </div>
+                </div>
+                <div class="grid-campos grid-4">
+                  <div class="campo">
+                    <label for="vehiculo-marca">Marca <span class="obligatorio">*</span></label>
+                    <input type="text" id="vehiculo-marca" maxlength="40" required>
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-modelo">Modelo <span class="obligatorio">*</span></label>
+                    <input type="text" id="vehiculo-modelo" maxlength="40" required>
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-tipo">Tipo</label>
+                    <select id="vehiculo-tipo">
+                      <option value="Sedán">Sedán</option>
+                      <option value="Hatchback">Hatchback</option>
+                      <option value="SUV">SUV</option>
+                      <option value="Camioneta">Camioneta</option>
+                      <option value="Furgoneta">Furgoneta</option>
+                      <option value="Camión">Camión</option>
+                      <option value="Motocicleta">Motocicleta</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-anio">Año</label>
+                    <input type="number" id="vehiculo-anio" min="1950" max="2100" step="1" inputmode="numeric">
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-placa">Placa <span class="obligatorio">*</span></label>
+                    <input type="text" id="vehiculo-placa" maxlength="12" class="campo-placa" required>
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-kilometraje">Kilometraje</label>
+                    <input type="number" id="vehiculo-kilometraje" min="0" step="1" inputmode="numeric">
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-color">Color</label>
+                    <input type="text" id="vehiculo-color" maxlength="30">
+                  </div>
+                  <div class="campo">
+                    <label for="vehiculo-bateria">Batería</label>
+                    <input type="text" id="vehiculo-bateria" maxlength="80" placeholder="Marca, amperaje y estado">
+                  </div>
+                  <div class="campo campo-span-2">
+                    <label for="vehiculo-motor">N° de motor</label>
+                    <input type="text" id="vehiculo-motor" maxlength="40">
+                  </div>
+                  <div class="campo campo-span-2">
+                    <label for="vehiculo-vin">VIN / chasis</label>
+                    <input type="text" id="vehiculo-vin" maxlength="40">
+                  </div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-servicios">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">04</span>
+                  <div>
+                    <h3 id="titulo-servicios">Servicios a realizar</h3>
+                    <p>Agregá cada servicio con su importe en bolivianos.</p>
+                  </div>
+                </div>
+                <div class="tabla-servicios-contenedor">
+                  <table class="tabla-servicios">
+                    <thead>
+                      <tr>
+                        <th>Nombre del servicio</th>
+                        <th class="columna-importe">Importe (Bs)</th>
+                        <th class="columna-quitar"><span class="solo-lectores">Quitar</span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="cuerpo-servicios"></tbody>
+                  </table>
+                </div>
+                <div class="servicios-pie">
+                  <button type="button" class="btn btn-secundario" id="btn-agregar-servicio">＋ Agregar servicio</button>
+                  <div class="total-servicios">
+                    <span>Total de servicios</span>
+                    <strong id="total-servicios">Bs 0,00</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-estado">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">05</span>
+                  <div>
+                    <h3 id="titulo-estado">Estado del proceso</h3>
+                    <p>Actualizá la etapa en la que se encuentra el vehículo.</p>
+                  </div>
+                </div>
+                <div class="estado-selector">
+                  <div class="campo">
+                    <label for="orden-estado">Estado actual</label>
+                    <select id="orden-estado">
+                      <option value="recibido">Recibido</option>
+                      <option value="diagnostico">Diagnóstico</option>
+                      <option value="en_proceso">En proceso</option>
+                      <option value="esperando_repuestos">Esperando repuestos</option>
+                      <option value="control_calidad">Control de calidad</option>
+                      <option value="terminado">Terminado</option>
+                      <option value="entregado">Entregado</option>
+                    </select>
+                  </div>
+                  <div class="estado-stepper" id="orden-stepper"></div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-fotos">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">06</span>
+                  <div>
+                    <h3 id="titulo-fotos">Fotos de recepción</h3>
+                    <p>Registrá el estado del vehículo al ingresar. Las imágenes se comprimen automáticamente.</p>
+                  </div>
+                </div>
+                <div class="zona-fotos" id="zona-fotos">
+                  <div class="fotos-acciones">
+                    <button type="button" class="btn btn-secundario" id="btn-subir-fotos">Subir fotos</button>
+                    <button type="button" class="btn btn-secundario" id="btn-tomar-foto">Tomar foto</button>
+                    <span class="ayuda-fotos">Máximo 800 px de lado · JPEG calidad 0,7 · También podés arrastrar imágenes aquí.</span>
+                  </div>
+                  <input type="file" id="input-fotos" accept="image/*" multiple hidden>
+                  <input type="file" id="input-camara" accept="image/*" capture="environment" hidden>
+                  <div id="galeria-fotos" class="galeria-fotos"></div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-notas">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">07</span>
+                  <div>
+                    <h3 id="titulo-notas">Notas internas</h3>
+                    <p>Observaciones para el equipo del taller. No se muestran en el portal del cliente.</p>
+                  </div>
+                </div>
+                <div class="campo">
+                  <label for="orden-notas">Notas</label>
+                  <textarea id="orden-notas" rows="4" maxlength="1000" placeholder="Ej.: el cliente autoriza revisar la suspensión si es necesario."></textarea>
+                </div>
+              </section>
+
+              <div class="barra-guardar">
+                <div class="total-grande">
+                  <span>Total general</span>
+                  <strong id="orden-total">Bs 0,00</strong>
+                </div>
+                <div class="barra-guardar-acciones">
+                  <button type="button" class="btn btn-secundario" id="btn-cancelar-orden">Cancelar</button>
+                  <button type="submit" class="btn btn-primario btn-grande" id="btn-guardar-orden">Guardar orden</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- Hoja limpia que se usa al imprimir / exportar a PDF -->
+  <div id="hoja-impresion" class="hoja-impresion" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       MODAL: CREAR / EDITAR EVENTO
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-evento" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-evento-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Agenda</span>
+          <h2 id="modal-evento-titulo">Nuevo evento</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <form id="form-evento">
+        <div class="modal-cuerpo">
+          <div class="campo">
+            <label for="evento-titulo">Título del evento <span class="obligatorio">*</span></label>
+            <input type="text" id="evento-titulo" maxlength="100" required placeholder="Ej.: Recepción Toyota Hilux - Juan Pérez">
+          </div>
+
+          <div class="campo">
+            <span class="etiqueta-grupo">Tipo de evento</span>
+            <div id="selector-tipo-evento" class="selector-tipo" role="radiogroup" aria-label="Tipo de evento"></div>
+          </div>
+
+          <div class="grid-campos grid-3">
+            <div class="campo">
+              <label for="evento-fecha">Fecha <span class="obligatorio">*</span></label>
+              <input type="date" id="evento-fecha" required>
+            </div>
+            <div class="campo">
+              <label for="evento-hora-inicio">Hora de inicio <span class="obligatorio">*</span></label>
+              <input type="time" id="evento-hora-inicio" required>
+            </div>
+            <div class="campo">
+              <label for="evento-hora-fin">Hora de fin <span class="obligatorio">*</span></label>
+              <input type="time" id="evento-hora-fin" required>
+            </div>
+          </div>
+
+          <div class="grid-campos grid-2">
+            <div class="campo">
+              <label for="evento-cliente">Cliente</label>
+              <input type="text" id="evento-cliente" maxlength="100">
+            </div>
+            <div class="campo">
+              <label for="evento-placa">Placa</label>
+              <input type="text" id="evento-placa" maxlength="12" class="campo-placa">
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="evento-orden">Orden de trabajo vinculada</label>
+            <select id="evento-orden">
+              <option value="">Sin orden vinculada</option>
+            </select>
+            <p class="ayuda-campo">Al elegir una orden se completan automáticamente el cliente y la placa.</p>
+          </div>
+
+          <div class="campo">
+            <label for="evento-notas">Notas</label>
+            <textarea id="evento-notas" rows="3" maxlength="500" placeholder="Detalles para el equipo…"></textarea>
+          </div>
+
+          <div id="evento-aviso-conflicto" class="aviso-inline oculto"></div>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar-modal>Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: DETALLE DE EVENTO
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-detalle-evento" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-detalle-titulo">
+    <div class="modal">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Agenda</span>
+          <h2 id="modal-detalle-titulo">Detalle del evento</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo" id="detalle-evento-contenido"></div>
+      <div class="modal-pie modal-pie-dividido">
+        <button type="button" class="btn btn-peligro-suave" id="btn-eliminar-evento">Eliminar</button>
+        <div class="espaciador"></div>
+        <button type="button" class="btn btn-secundario" data-cerrar-modal>Cerrar</button>
+        <button type="button" class="btn btn-primario" id="btn-editar-evento">Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: LISTA GENERAL DE CONFLICTOS
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-conflictos" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-conflictos-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Agenda</span>
+          <h2 id="modal-conflictos-titulo">Eventos superpuestos</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo" id="lista-conflictos-modal"></div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" data-cerrar-modal>Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: AVISO AL GUARDAR UN EVENTO SUPERPUESTO
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-aviso-conflicto" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-aviso-titulo">
+    <div class="modal">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta modal-etiqueta-aviso">Atención</span>
+          <h2 id="modal-aviso-titulo">El evento se superpone</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="texto-aviso">El horario elegido coincide con los siguientes eventos. Podés guardarlo igualmente o volver para cambiar el horario.</p>
+        <div id="lista-aviso-conflicto" class="lista-conflictos"></div>
+      </div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" id="btn-cambiar-horario">Cambiar horario</button>
+        <button type="button" class="btn btn-peligro" id="btn-guardar-igual">Guardar de todos modos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: COMPARTIR POR WHATSAPP
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-whatsapp" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-whatsapp-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Portal del cliente</span>
+          <h2 id="modal-whatsapp-titulo">Compartir por WhatsApp</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div class="whatsapp-resumen" id="whatsapp-resumen"></div>
+        <div class="campo">
+          <label for="whatsapp-link">Link de consulta (estático)</label>
+          <div class="campo-con-boton">
+            <input type="text" id="whatsapp-link" readonly>
+            <button type="button" class="btn btn-secundario" id="btn-copiar-link">Copiar link</button>
+          </div>
+          <p class="ayuda-campo">El portal siempre muestra los datos actuales del taller. El resumen del hash es solo un respaldo si el link se abre en otro navegador.</p>
+        </div>
+        <div class="campo">
+          <label for="whatsapp-mensaje">Mensaje para el cliente</label>
+          <textarea id="whatsapp-mensaje" rows="5"></textarea>
+          <p class="ayuda-campo">Podés editar el mensaje antes de enviarlo.</p>
+        </div>
+        <div class="aviso-demo">
+          <span class="aviso-demo-icono">i</span>
+          <span>Demo sin backend: el link incluye un resumen codificado de la orden en el hash (sin fotos ni notas internas) para que el portal funcione incluso en otro navegador.</span>
+        </div>
+      </div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" data-cerrar-modal>Cerrar</button>
+        <button type="button" class="btn btn-whatsapp" id="btn-enviar-whatsapp">Enviar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: CONFIRMACIÓN
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-confirmar" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirmar-titulo">
+    <div class="modal modal-sm">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Confirmación</span>
+          <h2 id="confirmar-titulo">Confirmar acción</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p id="confirmar-mensaje">¿Deseas continuar?</p>
+      </div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" id="btn-confirmar-cancelar">Cancelar</button>
+        <button type="button" class="btn btn-peligro" id="btn-confirmar-aceptar">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       VISOR DE FOTOS (LIGHTBOX)
+       ============================================================ -->
+  <div class="modal-fondo modal-lightbox" id="modal-lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Visor de fotos">
+    <div class="lightbox-contenido">
+      <button type="button" class="lightbox-cerrar" data-cerrar-modal aria-label="Cerrar visor">✕</button>
+      <button type="button" class="lightbox-nav lightbox-anterior" id="lightbox-anterior" aria-label="Foto anterior">‹</button>
+      <img id="lightbox-imagen" src="" alt="">
+      <button type="button" class="lightbox-nav lightbox-siguiente" id="lightbox-siguiente" aria-label="Foto siguiente">›</button>
+      <div class="lightbox-pie">
+        <p id="lightbox-descripcion"></p>
+        <span id="lightbox-contador"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utilidades.js"></script>
+  <script src="js/almacen.js"></script>
+  <script src="js/datos-demo.js"></script>
+  <script src="js/agenda.js"></script>
+  <script src="js/ordenes.js"></script>
+  <script src="js/whatsapp.js"></script>
+  <script>
+    /* =========================================================
+       ARRANQUE DE LA APLICACIÓN INTERNA
+       Navegación, datos de demo, importación/exportación y menú.
+       ========================================================= */
+    document.addEventListener('DOMContentLoaded', () => {
+      const resultadoInicio = Almacen.inicializar();
+
+      const titulos = {
+        agenda: { titulo: 'Agenda del taller', miga: 'Operación / Agenda' },
+        ordenes: { titulo: 'Órdenes de trabajo', miga: 'Operación / Órdenes de trabajo' }
+      };
+
+      function actualizarContadoresApp() {
+        const eventos = Almacen.obtenerEventos();
+        const ordenes = Almacen.obtenerOrdenes();
+        const badgeEventos = document.getElementById('nav-badge-eventos');
+        const badgeOrdenes = document.getElementById('nav-badge-ordenes');
+        if (badgeEventos) badgeEventos.textContent = String(eventos.length);
+        if (badgeOrdenes) badgeOrdenes.textContent = String(ordenes.length);
+      }
+
+      function cerrarMenuMovil() {
+        document.body.classList.remove('sidebar-abierto');
+      }
+
+      function mostrarVista(nombre) {
+        const vista = document.getElementById(`vista-${nombre}`);
+        if (!vista) return;
+        document.querySelectorAll('.vista').forEach((seccion) => seccion.classList.add('oculto'));
+        vista.classList.remove('oculto');
+        document.querySelectorAll('[data-vista]').forEach((boton) => {
+          boton.classList.toggle('activo', boton.dataset.vista === nombre);
+        });
+        const info = titulos[nombre] || titulos.agenda;
+        document.getElementById('topbar-titulo').textContent = info.titulo;
+        document.getElementById('topbar-miga').textContent = info.miga;
+        if (nombre === 'ordenes' && window.Ordenes && typeof Ordenes.mostrarListado === 'function') {
+          Ordenes.mostrarListado();
+        }
+        if (nombre === 'agenda' && window.Agenda && typeof Agenda.recargar === 'function') {
+          Agenda.recargar();
+        }
+        cerrarMenuMovil();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      window.mostrarVista = mostrarVista;
+      window.actualizarContadoresApp = actualizarContadoresApp;
+      window.establecerTituloApp = (titulo, miga) => {
+        document.getElementById('topbar-titulo').textContent = titulo;
+        document.getElementById('topbar-miga').textContent = miga;
+      };
+      window.recargarAplicacion = () => {
+        if (window.Agenda) Agenda.recargar();
+        if (window.Ordenes) Ordenes.recargar();
+        actualizarContadoresApp();
+      };
+
+      /* Fecha actual en la barra superior. */
+      const chipFecha = document.getElementById('chip-fecha-hoy');
+      if (chipFecha) {
+        chipFecha.textContent = capitalizar(formatearFechaLarga(new Date(), false));
+      }
+      const marca = document.getElementById('marca-nombre');
+      if (marca) marca.textContent = CONFIG.nombreTaller.replace(' Demo', '');
+
+      /* Navegación principal. */
+      document.querySelectorAll('[data-vista]').forEach((boton) => {
+        boton.addEventListener('click', () => mostrarVista(boton.dataset.vista));
+      });
+
+      /* Menú móvil. */
+      document.getElementById('btn-abrir-menu')?.addEventListener('click', () => {
+        document.body.classList.add('sidebar-abierto');
+      });
+      document.getElementById('btn-cerrar-menu')?.addEventListener('click', cerrarMenuMovil);
+      document.getElementById('sidebar-fondo')?.addEventListener('click', cerrarMenuMovil);
+      document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape') cerrarMenuMovil();
+      });
+
+      /* Exportar todos los datos. */
+      document.getElementById('btn-exportar-datos')?.addEventListener('click', () => {
+        const contenido = Almacen.exportarTodo();
+        const nombre = `taller-demo-${aISOfecha(new Date())}.json`;
+        if (descargarArchivo(nombre, contenido)) {
+          mostrarToast('Datos exportados correctamente.', 'exito');
+        }
+      });
+
+      /* Importar datos desde un archivo JSON. */
+      const inputImportar = document.getElementById('input-importar');
+      document.getElementById('btn-importar-datos')?.addEventListener('click', () => {
+        inputImportar?.click();
+      });
+      inputImportar?.addEventListener('change', async () => {
+        const archivo = inputImportar.files && inputImportar.files[0];
+        if (!archivo) return;
+        try {
+          const texto = await archivo.text();
+          const resultado = Almacen.importarTodo(texto);
+          if (!resultado.ok) {
+            mostrarToast(resultado.mensaje || 'No se pudo importar el archivo.', 'error', 6000);
+            return;
+          }
+          window.recargarAplicacion();
+          mostrarToast('Datos importados correctamente.', 'exito');
+        } catch (error) {
+          mostrarToast('No se pudo leer el archivo seleccionado.', 'error');
+        } finally {
+          inputImportar.value = '';
+        }
+      });
+
+      /* Restablecer los datos de demostración. */
+      document.getElementById('btn-restablecer-demo')?.addEventListener('click', async () => {
+        const confirmado = await confirmarAccion({
+          titulo: 'Restablecer datos de demo',
+          mensaje: 'Se borrarán todas las órdenes, eventos y fotos guardadas en este navegador, y se volverán a cargar los ejemplos. Esta acción no se puede deshacer.',
+          textoAceptar: 'Restablecer',
+          peligro: true
+        });
+        if (!confirmado) return;
+        const resultado = Almacen.restablecerDemo();
+        if (!resultado.ok) {
+          mostrarToast(resultado.mensaje || 'No se pudieron restablecer los datos.', 'error', 6000);
+          return;
+        }
+        window.recargarAplicacion();
+        mostrarToast('Datos de demo restablecidos.', 'exito');
+      });
+
+      actualizarContadoresApp();
+
+      if (!Almacen.persistenciaDisponible) {
+        mostrarToast('Este navegador bloquea localStorage. Los cambios se perderán al cerrar la pestaña.', 'aviso', 7000);
+      } else if (resultadoInicio && resultadoInicio.sembrado) {
+        mostrarToast('Datos de demostración cargados.', 'info');
+      }
+
+      if (window.Agenda) Agenda.iniciar();
+      if (window.Ordenes) Ordenes.iniciar();
+      mostrarVista('agenda');
+    });
+  </script>
+</body>
+</html>
