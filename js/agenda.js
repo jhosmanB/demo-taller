@@ -49,6 +49,10 @@ const Agenda = (() => {
     elementos.leyenda = document.getElementById('leyenda-tipos');
     elementos.selectorTipo = document.getElementById('selector-tipo-evento');
     elementos.formEvento = document.getElementById('form-evento');
+    elementos.cuerpoEvento = elementos.formEvento?.querySelector('.modal-cuerpo');
+    elementos.scrollControles = document.getElementById('evento-scroll-controles');
+    elementos.scrollArriba = document.getElementById('evento-scroll-arriba');
+    elementos.scrollAbajo = document.getElementById('evento-scroll-abajo');
     elementos.modalEventoTitulo = document.getElementById('modal-evento-titulo');
     elementos.eventoTitulo = document.getElementById('evento-titulo');
     elementos.eventoFecha = document.getElementById('evento-fecha');
@@ -122,6 +126,10 @@ const Agenda = (() => {
 
     /* Formulario de evento. */
     elementos.formEvento?.addEventListener('submit', manejarEnvioFormulario);
+    elementos.cuerpoEvento?.addEventListener('scroll', actualizarControlesScrollEvento, { passive: true });
+    elementos.scrollArriba?.addEventListener('click', () => desplazarFormularioEvento('arriba'));
+    elementos.scrollAbajo?.addEventListener('click', () => desplazarFormularioEvento('abajo'));
+    window.addEventListener('resize', actualizarControlesScrollEvento);
 
     /* Detalle: editar, eliminar y abrir orden. */
     document.getElementById('btn-editar-evento')?.addEventListener('click', () => {
@@ -727,6 +735,37 @@ const Agenda = (() => {
     elementos.eventoOrden.value = idSeleccionado || '';
   }
 
+  /**
+   * Muestra u oculta los controles de desplazamiento del formulario
+   * y deshabilita la flecha que ya no tiene recorrido.
+   */
+  function actualizarControlesScrollEvento() {
+    const cuerpo = elementos.cuerpoEvento;
+    const controles = elementos.scrollControles;
+    if (!cuerpo || !controles) return;
+
+    const desborda = cuerpo.scrollHeight > cuerpo.clientHeight + 4;
+    controles.hidden = !desborda;
+    if (!desborda) return;
+
+    const maximo = cuerpo.scrollHeight - cuerpo.clientHeight;
+    if (elementos.scrollArriba) elementos.scrollArriba.disabled = cuerpo.scrollTop <= 2;
+    if (elementos.scrollAbajo) elementos.scrollAbajo.disabled = cuerpo.scrollTop >= maximo - 2;
+  }
+
+  /** Lleva el cuerpo del formulario al inicio o al final. */
+  function desplazarFormularioEvento(direccion) {
+    const cuerpo = elementos.cuerpoEvento;
+    if (!cuerpo) return;
+
+    const reducido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    cuerpo.scrollTo({
+      top: direccion === 'arriba' ? 0 : cuerpo.scrollHeight,
+      behavior: reducido ? 'auto' : 'smooth'
+    });
+    setTimeout(actualizarControlesScrollEvento, 350);
+  }
+
   function abrirNuevoEvento() {
     abrirFormularioEvento({});
   }
@@ -777,11 +816,15 @@ const Agenda = (() => {
       cargarOpcionesOrdenes(idOrden);
     }
 
+    if (elementos.cuerpoEvento) elementos.cuerpoEvento.scrollTop = 0;
     Modal.abrir('modal-evento');
     setTimeout(() => {
+      actualizarControlesScrollEvento();
       if (!elementos.eventoTitulo.value) elementos.eventoTitulo.focus();
       else elementos.eventoTitulo.select();
     }, 100);
+    /* Segundo ajuste por si las fuentes o el alto del modal cambian. */
+    setTimeout(actualizarControlesScrollEvento, 320);
   }
 
   function completarDesdeOrden() {

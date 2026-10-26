@@ -63,6 +63,7 @@ No hace falta instalar dependencias ni ejecutar ningún build.
 - Leyenda de tipos de evento con filtros para mostrar u ocultar cada tipo.
 - Contador de conflictos y panel lateral con los eventos superpuestos.
 - Creación, edición y eliminación de eventos.
+- El modal de evento mantiene siempre visible el botón **Guardar evento**. El cuerpo del formulario se desplaza con la barra lateral o con los botones **↑ / ↓** de la cabecera.
 - Detección de superposiciones: si dos eventos se cruzan en el tiempo, se marcan en rojo y se cuentan como un conflicto.
 - Al guardar un evento que se superpone, aparece un aviso con dos opciones:
   - **Cambiar horario** para volver al formulario.

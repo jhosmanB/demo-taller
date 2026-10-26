@@ -1029,11 +1029,49 @@ select {
 
 .modal-cabecera {
   display: flex;
+  flex: 0 0 auto;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
   padding: 18px 22px;
   border-bottom: 1px solid var(--borde);
+}
+
+.modal-cabecera-acciones {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-scroll-controles {
+  display: flex;
+  gap: 4px;
+}
+
+.modal-scroll-controles[hidden] {
+  display: none;
+}
+
+.btn-scroll {
+  width: 32px;
+  height: 32px;
+}
+
+.btn-scroll .icono svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-scroll:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-scroll:disabled:hover {
+  background: #fff;
+  border-color: var(--gris-300);
+  color: var(--carbon-700);
 }
 
 .modal-cabecera h2 {
@@ -1064,8 +1102,46 @@ select {
   overflow-y: auto;
 }
 
+/* El formulario de evento ocupa el alto disponible: el cuerpo se
+   desplaza y el pie con "Guardar evento" queda siempre visible. */
+#form-evento {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#form-evento .modal-cuerpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gris-300) transparent;
+}
+
+#form-evento .modal-cuerpo::-webkit-scrollbar {
+  width: 9px;
+}
+
+#form-evento .modal-cuerpo::-webkit-scrollbar-track {
+  background: var(--gris-50);
+  border-radius: 8px;
+}
+
+#form-evento .modal-cuerpo::-webkit-scrollbar-thumb {
+  border: 2px solid var(--gris-50);
+  border-radius: 8px;
+  background: var(--gris-300);
+}
+
+#form-evento .modal-cuerpo::-webkit-scrollbar-thumb:hover {
+  background: var(--gris-400);
+}
+
 .modal-pie {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
   gap: 9px;
