@@ -1,0 +1,2208 @@
+/* =========================================================
+   HISTORIAL, CLIENTES Y VEHÍCULOS
+   Listados, fichas, línea de tiempo, gráfico de kilometraje,
+   recordatorios y hoja de impresión del carnet.
+   ========================================================= */
+
+/* =========================================================
+   LISTADO DE CLIENTES Y VEHÍCULOS
+   ========================================================= */
+.clientes-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.clientes-resumen .estadistica {
+  cursor: default;
+}
+
+.clientes-barra {
+  flex-wrap: wrap;
+}
+
+.clientes-barra .selector-vista {
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.tabla-clientes {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.tabla-clientes th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--gris-50);
+  color: var(--texto-suave);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabla-clientes th:first-child {
+  padding-left: 18px;
+}
+
+.tabla-clientes td {
+  padding: 12px;
+  border-bottom: 1px solid var(--gris-100);
+  vertical-align: middle;
+}
+
+.tabla-clientes td:first-child {
+  padding-left: 18px;
+}
+
+.tabla-clientes tbody tr {
+  cursor: pointer;
+  transition: background var(--transicion);
+}
+
+.tabla-clientes tbody tr:hover {
+  background: #FFFBEB;
+}
+
+.tabla-clientes tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.th-orden {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.th-orden:hover {
+  color: var(--naranja-oscuro);
+}
+
+.th-orden span {
+  color: var(--gris-400);
+  font-size: 10px;
+}
+
+.columna-numero {
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ficha-etiquetas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.etiqueta-frecuente { background: #D1FAE5; color: #047857; }
+.etiqueta-nuevo { background: #DBEAFE; color: #1D4ED8; }
+.etiqueta-inactivo { background: #FEE2E2; color: #B91C1C; }
+.etiqueta-neutra { background: var(--gris-100); color: var(--gris-500); }
+
+/* =========================================================
+   FICHA DEL CLIENTE Y DEL VEHÍCULO
+   ========================================================= */
+.ficha-cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.ficha-cabecera-texto {
+  flex: 1;
+  min-width: 220px;
+}
+
+.ficha-cabecera h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 2px 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.ficha-subtitulo {
+  color: #4B5563;
+  font-size: 12.5px;
+}
+
+.ficha-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ficha-acciones .icono svg {
+  width: 15px;
+  height: 15px;
+}
+
+.ficha-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ficha-resumen-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 15px;
+}
+
+.ficha-resumen-icono {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--naranja-claro);
+  color: var(--naranja-oscuro);
+}
+
+.ficha-resumen-icono svg {
+  width: 19px;
+  height: 19px;
+}
+
+.ficha-resumen-datos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ficha-resumen-datos strong {
+  color: var(--carbon-900);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.ficha-resumen-datos > span {
+  color: var(--carbon-700);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ficha-resumen-datos small {
+  color: #6B7280;
+  font-size: 10px;
+}
+
+.ficha-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.ficha-datos,
+.ficha-vehiculos,
+.ficha-grafico,
+.ficha-mantenimiento,
+.ficha-timeline {
+  padding: 18px 20px 20px;
+}
+
+.ficha-datos {
+  display: flex;
+  flex-direction: column;
+}
+
+.lista-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.dato {
+  min-width: 0;
+}
+
+.dato-ancho {
+  grid-column: 1 / -1;
+}
+
+.dato dt {
+  color: #6B7280;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dato dd {
+  margin: 2px 0 0;
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ficha-datos-pie {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.vehiculos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.vehiculo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 13px 14px;
+  border: 1px solid var(--borde);
+  text-align: left;
+  transition: border-color var(--transicion), box-shadow var(--transicion), transform var(--transicion);
+}
+
+.vehiculo-card:hover {
+  border-color: #FDBA74;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.09);
+  transform: translateY(-1px);
+}
+
+.vehiculo-card-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vehiculo-card-visitas {
+  color: var(--texto-suave);
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vehiculo-card-nombre {
+  color: var(--carbon-900);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.vehiculo-card-detalle,
+.vehiculo-card-km {
+  color: var(--texto-suave);
+  font-size: 11.5px;
+}
+
+.vehiculo-card-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 7px;
+  border-top: 1px solid var(--gris-100);
+  color: #6B7280;
+  font-size: 10px;
+}
+
+.vehiculo-card-enlace {
+  color: #C2410C;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vehiculos-vacio {
+  grid-column: 1 / -1;
+  padding: 18px;
+  border: 1px dashed var(--gris-300);
+  border-radius: var(--radio-sm);
+  color: var(--texto-suave);
+  font-size: 12px;
+  text-align: center;
+}
+
+.vehiculos-vacio p {
+  margin-bottom: 10px;
+}
+
+.btn-bloque {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.placa-chip-grande {
+  padding: 5px 10px;
+  font-size: 14px;
+  letter-spacing: 1.4px;
+}
+
+.enlace-texto {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #C2410C;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+}
+
+.enlace-texto:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   LÍNEA DE TIEMPO
+   ========================================================= */
+.ficha-timeline {
+  margin-bottom: 16px;
+}
+
+.linea-tiempo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 24px;
+}
+
+.linea-tiempo::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 7px;
+  width: 2px;
+  background: var(--gris-200);
+}
+
+.linea-tiempo-item {
+  position: relative;
+}
+
+.linea-tiempo-punto {
+  position: absolute;
+  top: 18px;
+  left: -23px;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--blanco);
+  border-radius: 50%;
+  background: var(--naranja);
+  box-shadow: 0 0 0 1px #FDBA74;
+}
+
+.linea-tiempo-tarjeta {
+  padding: 14px 16px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  background: var(--gris-50);
+}
+
+.linea-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.linea-cabecera-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.linea-fecha {
+  color: var(--carbon-900);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.linea-sub {
+  color: var(--gris-400);
+  font-size: 10.5px;
+}
+
+.linea-badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.linea-vehiculo {
+  margin: 5px 0 0;
+  color: var(--carbon-700);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.linea-datos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px 14px;
+  margin-top: 9px;
+  padding: 8px 0;
+  border-top: 1px solid var(--gris-200);
+  border-bottom: 1px solid var(--gris-200);
+}
+
+.linea-datos p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.linea-datos span {
+  color: var(--gris-400);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.linea-datos strong {
+  color: var(--carbon-800);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.linea-etiqueta {
+  display: block;
+  margin-bottom: 3px;
+  color: #4B5563;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.linea-servicios-contenedor {
+  margin-top: 8px;
+}
+
+.linea-servicios {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linea-servicios li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--carbon-800);
+  font-size: 12px;
+}
+
+.linea-servicios li strong {
+  color: var(--carbon-900);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.linea-sin-datos {
+  color: var(--texto-suave);
+  font-style: italic;
+}
+
+.linea-repuestos {
+  margin-top: 7px;
+}
+
+.linea-repuestos ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--texto-suave);
+  font-size: 11px;
+}
+
+.linea-repuestos li span {
+  color: var(--gris-400);
+}
+
+.linea-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--gris-200);
+}
+
+.linea-total {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.linea-total span {
+  color: var(--gris-400);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.linea-total strong {
+  color: var(--carbon-900);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.linea-condiciones {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 180px;
+  color: var(--texto-suave);
+  font-size: 10.5px;
+}
+
+.linea-recomendaciones {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #FFFBEB;
+}
+
+.linea-recomendaciones ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linea-recomendaciones li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--carbon-700);
+  font-size: 11px;
+}
+
+.texto-atendida {
+  color: var(--verde);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.linea-fotos {
+  display: flex;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.linea-foto {
+  width: 62px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--gris-300);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--gris-100);
+  cursor: zoom-in;
+}
+
+.linea-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transicion);
+}
+
+.linea-foto:hover img {
+  transform: scale(1.08);
+}
+
+.linea-tiempo-vacia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 16px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  text-align: center;
+}
+
+.linea-tiempo-vacia-icono svg {
+  width: 30px;
+  height: 30px;
+  color: var(--gris-300);
+}
+
+.timeline-mas {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* Badges de categoría, urgencia y garantía */
+.badge-categoria { background: var(--gris-100); color: var(--carbon-700); }
+.badge-categoria-mantenimiento { background: #DBEAFE; color: #1D4ED8; }
+.badge-categoria-reparacion { background: #FFEDD5; color: #C2410C; }
+.badge-categoria-diagnostico { background: #EDE9FE; color: #6D28D9; }
+.badge-categoria-carroceria_pintura { background: #FCE7F3; color: #BE185D; }
+.badge-categoria-electricidad { background: #FEF9C3; color: #A16207; }
+.badge-categoria-neumaticos { background: #E5E7EB; color: #374151; }
+
+.badge-urgencia-alta { background: #FEE2E2; color: #B91C1C; }
+.badge-urgencia-media { background: #FEF3C7; color: #B45309; }
+.badge-urgencia-baja { background: #DBEAFE; color: #1D4ED8; }
+
+.badge-garantia-vigente { background: #D1FAE5; color: #047857; }
+.badge-garantia-por-vencer { background: #FEF3C7; color: #B45309; }
+.badge-garantia-vencida { background: #FEE2E2; color: #B91C1C; }
+
+/* =========================================================
+   GRÁFICO DE KILOMETRAJE
+   ========================================================= */
+.ficha-grafico {
+  min-width: 0;
+}
+
+.grafico-kilometraje {
+  width: 100%;
+  overflow: hidden;
+}
+
+.grafico-kilometraje svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.grafico-texto {
+  fill: #9CA3AF;
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.grafico-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 180px;
+  padding: 20px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  text-align: center;
+}
+
+.grafico-vacio svg {
+  width: 30px;
+  height: 30px;
+  color: var(--gris-300);
+}
+
+/* =========================================================
+   ESTADO DE MANTENIMIENTO
+   ========================================================= */
+.mantenimiento-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 14px 22px;
+  padding: 15px 17px;
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--gris-300);
+  border-radius: var(--radio-sm);
+  background: var(--gris-50);
+}
+
+.mantenimiento-panel.mantenimiento-vencido { border-left-color: var(--rojo); background: #FEF2F2; }
+.mantenimiento-panel.mantenimiento-proximo { border-left-color: var(--amarillo); background: #FEFCE8; }
+.mantenimiento-panel.mantenimiento-aldia { border-left-color: var(--verde); background: #F0FDF4; }
+
+.mantenimiento-estado {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.mantenimiento-punto {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #9CA3AF;
+  box-shadow: 0 0 0 4px rgba(107, 114, 128, 0.14);
+}
+
+.mantenimiento-vencido .mantenimiento-punto { background: var(--rojo); box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15); }
+.mantenimiento-proximo .mantenimiento-punto { background: #CA8A04; box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.22); }
+.mantenimiento-aldia .mantenimiento-punto { background: var(--verde); box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15); }
+
+.mantenimiento-estado strong {
+  display: block;
+  color: var(--carbon-900);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mantenimiento-proximo p {
+  margin: 2px 0;
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.mantenimiento-proximo small {
+  color: #4B5563;
+  font-size: 10.5px;
+}
+
+.mantenimiento-bloque {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.mantenimiento-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mantenimiento-garantia,
+.mantenimiento-recomendacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 7px 9px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.mantenimiento-garantia > div,
+.mantenimiento-recomendacion > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mantenimiento-garantia strong {
+  color: var(--carbon-800);
+  font-size: 12px;
+}
+
+.mantenimiento-garantia span,
+.mantenimiento-recomendacion small {
+  color: #4B5563;
+  font-size: 10px;
+}
+
+.mantenimiento-recomendacion span {
+  color: var(--carbon-800);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mantenimiento-recomendacion-acciones {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* =========================================================
+   AUTOCOMPLETADO DEL FORMULARIO DE ÓRDENES
+   ========================================================= */
+.autocompletar-panel {
+  position: fixed;
+  z-index: 70;
+  max-height: 330px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--gris-200);
+  border-radius: 10px;
+  background: var(--blanco);
+  box-shadow: 0 14px 40px rgba(17, 24, 39, 0.2);
+}
+
+.autocompletar-opcion {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.autocompletar-opcion:hover,
+.autocompletar-opcion.activa {
+  background: var(--naranja-claro);
+}
+
+.autocompletar-icono {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: var(--gris-100);
+  color: var(--carbon-700);
+}
+
+.autocompletar-icono svg {
+  width: 15px;
+  height: 15px;
+}
+
+.autocompletar-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.autocompletar-texto strong {
+  color: var(--carbon-900);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autocompletar-texto small {
+  color: var(--texto-suave);
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autocompletar-tipo {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--gris-100);
+  color: var(--gris-500);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.autocompletar-vacio {
+  padding: 12px;
+  color: var(--texto-suave);
+  font-size: 11.5px;
+  text-align: center;
+}
+
+/* =========================================================
+   AVISOS DEL FORMULARIO DE ÓRDENES
+   ========================================================= */
+.aviso-vehiculo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 12px 15px;
+  border: 1px solid #BFDBFE;
+  border-left: 4px solid var(--azul);
+  border-radius: var(--radio-sm);
+  background: #EFF6FF;
+}
+
+.aviso-vehiculo-icono {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #DBEAFE;
+  color: var(--azul);
+}
+
+.aviso-vehiculo-icono svg {
+  width: 18px;
+  height: 18px;
+}
+
+.aviso-vehiculo-texto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+}
+
+.aviso-vehiculo-acciones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.aviso-vehiculo-alerta {
+  border-color: #FED7AA;
+  border-left-color: var(--naranja);
+  background: #FFF7ED;
+}
+
+.aviso-vehiculo-alerta .aviso-vehiculo-icono {
+  background: #FFEDD5;
+  color: var(--naranja-oscuro);
+}
+
+.aviso-vehiculo-alerta .aviso-vehiculo-texto strong {
+  color: #9A3412;
+}
+
+.aviso-vehiculo-alerta .aviso-vehiculo-texto span {
+  color: #C2410C;
+}
+
+.aviso-vehiculo-texto strong {
+  display: block;
+  color: #1E3A8A;
+  font-size: 12.5px;
+}
+
+.aviso-vehiculo-texto span {
+  color: #1D4ED8;
+  font-size: 11px;
+}
+
+.panel-recomendaciones {
+  margin-bottom: 14px;
+  padding: 12px 15px;
+  border: 1px solid #FDE68A;
+  border-left: 4px solid var(--amarillo);
+  border-radius: var(--radio-sm);
+  background: #FEFCE8;
+}
+
+.panel-recomendaciones-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.panel-recomendaciones-cabecera strong {
+  color: #854D0E;
+  font-size: 12.5px;
+  text-transform: uppercase;
+}
+
+.panel-recomendaciones-cabecera span {
+  color: #A16207;
+  font-size: 10.5px;
+}
+
+.panel-recomendaciones ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-recomendaciones li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--carbon-800);
+  font-size: 11.5px;
+}
+
+.panel-recomendaciones li > span {
+  flex: 1;
+  min-width: 160px;
+}
+
+.panel-recomendaciones-acciones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   HISTORIAL RÁPIDO DEL VEHÍCULO (MODAL)
+   ========================================================= */
+.historial-rapido-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  background: var(--gris-50);
+}
+
+.historial-rapido-resumen div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.historial-rapido-resumen span {
+  color: var(--gris-400);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.historial-rapido-resumen strong {
+  color: var(--carbon-900);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.historial-rapido-titulo {
+  margin: 0 0 9px;
+  color: var(--carbon-900);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .historial-rapido-resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   AJUSTES DE CAMPOS
+   ========================================================= */
+.campo-span-3 { grid-column: span 3; }
+.campo-span-4 { grid-column: 1 / -1; }
+
+/* =========================================================
+   TRABAJO Y SEGUIMIENTO (FORMULARIO DE ORDEN)
+   ========================================================= */
+.subseccion-trabajo {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--gris-200);
+}
+
+.subseccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 9px;
+}
+
+.subseccion-cabecera h4 {
+  margin: 0;
+  color: var(--carbon-900);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.tabla-repuestos {
+  min-width: 460px;
+}
+
+.tabla-repuestos .celda-cantidad {
+  width: 120px;
+}
+
+.tabla-repuestos .celda-cantidad input {
+  text-align: right;
+}
+
+.tabla-repuestos .columna-cantidad {
+  text-align: right;
+}
+
+.lista-recomendaciones-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recomendacion-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.recomendacion-fila input,
+.recomendacion-fila select {
+  width: 100%;
+}
+
+.recomendacion-vacia {
+  color: var(--texto-suave);
+  font-size: 11.5px;
+}
+
+@media (max-width: 720px) {
+  .recomendacion-fila {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* =========================================================
+   IMPRESIÓN DEL CARNET
+   ========================================================= */
+.hoja-historial {
+  color: #111827;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.impreso-tabla-historial td:nth-child(4) {
+  font-size: 9px;
+}
+
+@media print {
+  .hoja-historial .impreso-tabla {
+    font-size: 9px;
+  }
+
+  .hoja-historial .impreso-tabla th,
+  .hoja-historial .impreso-tabla td {
+    padding: 3px 5px;
+    font-size: 8.5px;
+  }
+
+  .hoja-historial .impreso-ficha strong {
+    font-size: 20px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 1100px) {
+  .clientes-resumen,
+  .ficha-resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ficha-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mantenimiento-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .linea-datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .tabla-contenedor {
+    overflow: visible;
+  }
+
+  .tabla-clientes {
+    display: block;
+    min-width: 0;
+  }
+
+  .tabla-clientes thead {
+    display: none;
+  }
+
+  .tabla-clientes tbody {
+    display: block;
+  }
+
+  .tabla-clientes tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gris-100);
+  }
+
+  .tabla-clientes tr:last-child {
+    border-bottom: 0;
+  }
+
+  .tabla-clientes td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .tabla-clientes td[data-etiqueta]::before {
+    content: attr(data-etiqueta);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--gris-400);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tabla-clientes td.columna-acciones {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .tabla-clientes .celda-cliente,
+  .tabla-clientes .celda-vehiculo {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 720px) {
+  .ficha-cabecera h2 {
+    font-size: 23px;
+  }
+
+  .ficha-acciones {
+    width: 100%;
+  }
+
+  .ficha-acciones .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .vehiculos-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lista-datos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .linea-tiempo {
+    padding-left: 20px;
+  }
+
+  .linea-tiempo-punto {
+    left: -19px;
+  }
+
+  .linea-datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .linea-pie {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .linea-condiciones {
+    min-width: 0;
+  }
+
+  .linea-fotos {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .clientes-resumen,
+  .ficha-resumen {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tabla-clientes tr {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tabla-clientes td.columna-acciones {
+    justify-content: flex-start;
+  }
+
+  .linea-datos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mantenimiento-recomendacion,
+  .mantenimiento-garantia {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   HISTORIAL GENERAL DE TRABAJOS
+   ========================================================= */
+.historial-filtros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 14px;
+  align-items: end;
+}
+
+.historial-busqueda {
+  grid-column: span 2;
+  min-width: 0;
+}
+
+.historial-tabla-tarjeta {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* En anchos intermedios la tabla es más ancha que la tarjeta:
+   se permite desplazamiento horizontal en lugar de recortar columnas. */
+.historial-tabla-tarjeta .tabla-contenedor {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.historial-tabla-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.historial-tabla-cabecera h3 {
+  margin: 0;
+  color: var(--carbon-900);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.historial-tabla-cabecera .conteo-resultados {
+  margin-left: 0;
+  padding-bottom: 0;
+}
+
+.tabla-historial {
+  width: 100%;
+  min-width: 1020px;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.tabla-historial th {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--gris-50);
+  color: var(--texto-suave);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabla-historial td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gris-100);
+  color: var(--texto);
+  vertical-align: top;
+}
+
+.tabla-historial tbody tr:hover {
+  background: var(--gris-50);
+}
+
+.tabla-historial tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-historial .der {
+  text-align: right;
+}
+
+.celda-fecha,
+.celda-total {
+  white-space: nowrap;
+}
+
+.celda-total {
+  font-weight: 700;
+}
+
+.celda-vehiculo {
+  display: block;
+  color: var(--carbon-900);
+  font-size: 12.5px;
+}
+
+.celda-placa {
+  display: block;
+  color: #6B7280;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.celda-servicios {
+  max-width: 260px;
+  overflow: hidden;
+  color: var(--texto-suave);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.enlace-tabla {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #C2410C;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.enlace-tabla:hover {
+  color: #9A3412;
+}
+
+/* En pantallas chicas la tabla se convierte en tarjetas apiladas. */
+@media (max-width: 760px) {
+  .historial-tabla-tarjeta .tabla-contenedor {
+    overflow-x: visible;
+  }
+
+  .tabla-historial {
+    min-width: 0;
+  }
+
+  .tabla-historial thead {
+    display: none;
+  }
+
+  .tabla-historial tbody,
+  .tabla-historial tr,
+  .tabla-historial td {
+    display: block;
+  }
+
+  .tabla-historial tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--borde);
+  }
+
+  .tabla-historial tbody tr:hover {
+    background: transparent;
+  }
+
+  .tabla-historial td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    border-bottom: 0;
+    text-align: right;
+  }
+
+  .tabla-historial td[data-etiqueta]::before {
+    content: attr(data-etiqueta);
+    flex: 0 0 auto;
+    color: var(--texto-suave);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+  }
+
+  .tabla-historial .celda-servicios {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .tabla-historial .celda-vehiculo,
+  .tabla-historial .celda-placa {
+    display: inline;
+  }
+
+  .tabla-historial .celda-placa {
+    margin-left: 5px;
+  }
+
+  .tabla-historial .der {
+    text-align: right;
+  }
+
+  .tabla-historial .celda-total {
+    color: var(--carbon-900);
+    font-size: 13px;
+  }
+}
+
+.historial-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-top: 1px solid var(--borde);
+  background: var(--gris-50);
+}
+
+.historial-totales {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.historial-totales strong {
+  color: var(--carbon-900);
+  font-size: 13px;
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pagina-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--gris-300);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transicion), color var(--transicion), background var(--transicion);
+}
+
+.pagina-btn:hover:not(:disabled):not(.activa) {
+  border-color: var(--naranja);
+  color: var(--naranja-oscuro);
+}
+
+.pagina-btn.activa {
+  border-color: var(--naranja);
+  background: var(--naranja);
+  color: #fff;
+}
+
+.pagina-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagina-puntos {
+  align-self: center;
+  padding: 0 4px;
+  color: var(--gris-400);
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .historial-filtros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .historial-filtros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .historial-busqueda {
+    grid-column: span 2;
+  }
+
+  .historial-pie {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 520px) {
+  .historial-filtros {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .historial-busqueda {
+    grid-column: auto;
+  }
+}
+
+/* =========================================================
+   ESTADÍSTICAS DEL HISTORIAL
+   ========================================================= */
+.historial-estadisticas {
+  margin-bottom: 16px;
+}
+
+.historial-estadisticas-cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.historial-estadisticas-cabecera h3 {
+  margin: 0;
+  color: var(--carbon-900);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.historial-estadisticas-cabecera p {
+  margin: 2px 0 0;
+  color: #4B5563;
+  font-size: 11.5px;
+}
+
+.historial-periodo {
+  padding: 5px 11px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: #fff;
+  color: #C2410C;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.historial-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.historial-kpi {
+  align-items: flex-start;
+  cursor: default;
+}
+
+.historial-kpi:hover {
+  border-color: var(--borde);
+  box-shadow: none;
+  transform: none;
+}
+
+.historial-kpi .estadistica-datos {
+  flex: 1;
+}
+
+.historial-kpi .estadistica-datos strong {
+  font-size: 25px;
+}
+
+.historial-kpi .estadistica-datos > span {
+  font-size: 10.5px;
+}
+
+.historial-kpi-detalle {
+  display: block;
+  margin-top: 4px;
+  overflow: visible;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.historial-kpi-positivo {
+  color: #15803D !important;
+}
+
+.historial-kpi-negativo {
+  color: #B91C1C !important;
+}
+
+.historial-kpi-neutro {
+  color: #6B7280 !important;
+}
+
+.historial-paneles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.historial-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.historial-panel-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--gris-100);
+  background: var(--gris-50);
+}
+
+.historial-panel-cabecera h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--carbon-900);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+}
+
+.historial-panel-cabecera h4 .icono {
+  color: var(--naranja-oscuro);
+}
+
+.historial-panel-cabecera h4 .icono svg {
+  width: 15px;
+  height: 15px;
+}
+
+.historial-panel-cabecera > span {
+  color: #6B7280;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.historial-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 13px 14px 14px;
+  list-style: none;
+}
+
+.historial-ranking-cabecera {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 4px;
+}
+
+.historial-ranking-puesto {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gris-100);
+  color: var(--texto-suave);
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.historial-ranking-item:first-child .historial-ranking-puesto {
+  background: #FFF7ED;
+  color: var(--naranja-oscuro);
+}
+
+.historial-ranking-nombre {
+  overflow: hidden;
+  color: var(--texto);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historial-ranking-cabecera strong {
+  color: var(--carbon-900);
+  font-size: 11.5px;
+}
+
+.historial-ranking-barra {
+  height: 5px;
+  margin-left: 25px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--gris-100);
+}
+
+.historial-ranking-barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #FB923C, #EA580C);
+}
+
+.historial-panel-vacio {
+  margin: 0;
+  padding: 16px 14px;
+  color: var(--texto-suave);
+  font-size: 11.5px;
+}
+
+.historial-pago-barra {
+  display: flex;
+  height: 13px;
+  margin: 15px 14px 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--gris-100);
+}
+
+.historial-pago-barra .historial-pago-contado {
+  background: linear-gradient(90deg, #4ADE80, #16A34A);
+}
+
+.historial-pago-barra .historial-pago-credito {
+  background: linear-gradient(90deg, #FCD34D, #F59E0B);
+}
+
+.historial-pago-leyenda {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0 14px 14px;
+  list-style: none;
+}
+
+.historial-pago-leyenda li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.historial-pago-punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.historial-pago-punto.historial-pago-contado {
+  background: var(--verde);
+}
+
+.historial-pago-punto.historial-pago-credito {
+  background: var(--amarillo);
+}
+
+.historial-pago-etiqueta {
+  color: var(--texto);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.historial-pago-leyenda strong {
+  color: var(--carbon-900);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.historial-pago-leyenda small {
+  grid-column: 2 / -1;
+  margin-top: -3px;
+  color: #6B7280;
+  font-size: 9.5px;
+}
+
+@media (max-width: 1100px) {
+  .historial-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .historial-paneles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .historial-panel-pagos {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .historial-paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .historial-panel-pagos {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .historial-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .historial-kpi .estadistica-datos strong {
+    font-size: 22px;
+  }
+}
+
+/* =========================================================
+   RECORDATORIOS DE MANTENIMIENTO
+   ========================================================= */
+.chip-recordatorios {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip-recordatorios strong {
+  color: var(--naranja-oscuro);
+  font-size: 14px;
+}
+
+.recordatorios-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recordatorio-bloque {
+  padding: 0;
+  overflow: hidden;
+}
+
+.recordatorio-bloque-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--borde);
+  border-left: 4px solid var(--gris-300);
+}
+
+.recordatorio-bloque-cabecera h3 {
+  margin: 0;
+  color: var(--carbon-900);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.recordatorio-bloque-cabecera p {
+  margin: 2px 0 0;
+  color: #4B5563;
+  font-size: 11.5px;
+}
+
+.recordatorio-bloque-vencido .recordatorio-bloque-cabecera {
+  border-left-color: var(--rojo);
+  background: var(--rojo-claro);
+}
+
+.recordatorio-bloque-proximo .recordatorio-bloque-cabecera {
+  border-left-color: var(--amarillo);
+  background: #FEFCE8;
+}
+
+.recordatorio-bloque-garantia .recordatorio-bloque-cabecera {
+  border-left-color: var(--naranja);
+  background: #FFF7ED;
+}
+
+.recordatorio-bloque-recomendacion .recordatorio-bloque-cabecera {
+  border-left-color: #8B5CF6;
+  background: #F5F3FF;
+}
+
+.recordatorio-contador {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--carbon-900);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--borde);
+}
+
+.recordatorio-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recordatorio-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gris-100);
+}
+
+.recordatorio-item:last-child {
+  border-bottom: none;
+}
+
+.recordatorio-item-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.recordatorio-item-cabecera > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recordatorio-item-cabecera strong {
+  color: var(--carbon-900);
+  font-size: 13px;
+}
+
+.recordatorio-item-cabecera span {
+  color: #4B5563;
+  font-size: 11.5px;
+}
+
+.recordatorio-detalle {
+  margin: 6px 0 2px;
+  color: var(--texto);
+  font-size: 12.5px;
+}
+
+.recordatorio-kilometraje {
+  margin: 0;
+  color: #6B7280;
+  font-size: 11px;
+}
+
+.recordatorio-acciones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 9px;
+}
+
+.recordatorio-contactado {
+  margin-right: auto;
+  color: var(--verde);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.recordatorio-vacio {
+  margin: 0;
+  padding: 14px 16px;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.recordatorio-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.badge-recordatorio {
+  border: 1px solid var(--borde);
+  background: #fff;
+  color: var(--texto-suave);
+}
+
+@media (max-width: 900px) {
+  .recordatorio-columnas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .recordatorio-acciones .btn {
+    flex: 1 1 auto;
+  }
+}

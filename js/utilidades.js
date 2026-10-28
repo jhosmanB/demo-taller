@@ -59,6 +59,26 @@ const ETAPA_POR_ESTADO = {
 const FORMAS_PAGO = { contado: 'Contado', credito: 'Crédito' };
 const DOCUMENTOS = { factura: 'Factura', nota: 'Nota de venta' };
 
+/* Mecánicos de ejemplo. El formulario de orden permite escribir otros. */
+const MECANICOS = ['Carlos Mamani', 'Miguel Flores', 'Jorge Salazar'];
+
+/* Categorías del trabajo y urgencias de las recomendaciones. */
+const CATEGORIAS_TRABAJO = {
+  mantenimiento: 'Mantenimiento',
+  reparacion: 'Reparación',
+  diagnostico: 'Diagnóstico',
+  carroceria_pintura: 'Carrocería y pintura',
+  electricidad: 'Electricidad',
+  neumaticos: 'Neumáticos',
+  otro: 'Otro'
+};
+
+const URGENCIAS_RECOMENDACION = {
+  baja: 'Baja',
+  media: 'Media',
+  alta: 'Alta'
+};
+
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
@@ -108,7 +128,12 @@ const TRAZOS_ICONOS = {
   filtro: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
   moneda: '<circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 6v2M12 16v2"/>',
   tablero: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
-  escudo: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+  escudo: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  historial: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  campana: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  grafico: '<path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-8"/>',
+  recibo: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+  kilometro: '<path d="M12 14 8 8"/><path d="M4 20a8 8 0 1 1 16 0"/><circle cx="12" cy="14" r="1"/>'
 };
 
 /**
@@ -256,6 +281,26 @@ function aNumero(valor) {
 
 function normalizarPlaca(valor) {
   return String(valor || '').toUpperCase().replace(/\s+/g, '').trim();
+}
+
+/** Celular solo con dígitos, para comparar sin espacios ni guiones. */
+function normalizarCelular(valor) {
+  return String(valor || '').replace(/\D/g, '');
+}
+
+/** NIT o CI sin puntos, guiones ni espacios. */
+function normalizarDocumento(valor) {
+  return String(valor || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+}
+
+/** Nombre comparable: minúsculas, sin acentos y con espacios simples. */
+function normalizarNombre(valor) {
+  return String(valor || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function escaparHTML(valor) {

@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=2">
-  <link rel="stylesheet" href="css/agenda.css?v=2">
-  <link rel="stylesheet" href="css/ordenes.css?v=2">
+  <link rel="stylesheet" href="css/estilos.css?v=20">
+  <link rel="stylesheet" href="css/agenda.css?v=20">
+  <link rel="stylesheet" href="css/ordenes.css?v=20">
+  <link rel="stylesheet" href="css/historial.css?v=20">
 </head>
 <body>
   <a class="salto-contenido" href="#contenido-principal">Saltar al contenido principal</a>
@@ -47,6 +48,27 @@
           </span>
           <span class="nav-texto">Órdenes</span>
           <span class="nav-badge" id="nav-badge-ordenes">0</span>
+        </button>
+        <button type="button" class="nav-item" data-vista="clientes">
+          <span class="nav-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span class="nav-texto">Clientes</span>
+          <span class="nav-badge" id="nav-badge-clientes">0</span>
+        </button>
+        <button type="button" class="nav-item" data-vista="historial">
+          <span class="nav-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <span class="nav-texto">Historial</span>
+          <span class="nav-badge" id="nav-badge-historial">0</span>
+        </button>
+        <button type="button" class="nav-item" data-vista="recordatorios">
+          <span class="nav-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </span>
+          <span class="nav-texto">Recordatorios</span>
+          <span class="nav-badge" id="nav-badge-recordatorios">0</span>
         </button>
       </nav>
 
@@ -248,8 +270,13 @@
 
             <div id="errores-orden" class="errores-formulario oculto" role="alert"></div>
 
+            <div id="orden-aviso-vehiculo" class="aviso-vehiculo oculto" role="status"></div>
+            <div id="orden-recomendaciones" class="panel-recomendaciones oculto"></div>
+
             <form id="form-orden" novalidate>
               <input type="hidden" id="orden-original" value="">
+              <input type="hidden" id="orden-id-cliente" value="">
+              <input type="hidden" id="orden-id-vehiculo" value="">
 
               <section class="tarjeta form-seccion" aria-labelledby="titulo-datos-generales">
                 <div class="form-seccion-cabecera">
@@ -411,9 +438,85 @@
                 </div>
               </section>
 
-              <section class="tarjeta form-seccion" aria-labelledby="titulo-estado">
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-trabajo">
                 <div class="form-seccion-cabecera">
                   <span class="form-seccion-numero">05</span>
+                  <div>
+                    <h3 id="titulo-trabajo">Trabajo y seguimiento</h3>
+                    <p>Mecánico, categoría, repuestos, garantía y próximo servicio.</p>
+                  </div>
+                </div>
+                <div class="grid-campos grid-4">
+                  <div class="campo">
+                    <label for="orden-mecanico">Mecánico asignado</label>
+                    <input type="text" id="orden-mecanico" list="lista-mecanicos" maxlength="60" placeholder="Nombre del mecánico">
+                    <datalist id="lista-mecanicos"></datalist>
+                  </div>
+                  <div class="campo">
+                    <label for="orden-categoria">Categoría del trabajo</label>
+                    <select id="orden-categoria">
+                      <option value="mantenimiento">Mantenimiento</option>
+                      <option value="reparacion">Reparación</option>
+                      <option value="diagnostico">Diagnóstico</option>
+                      <option value="carroceria_pintura">Carrocería y pintura</option>
+                      <option value="electricidad">Electricidad</option>
+                      <option value="neumaticos">Neumáticos</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
+                  <div class="campo">
+                    <label for="orden-garantia-dias">Garantía (días)</label>
+                    <input type="number" id="orden-garantia-dias" min="0" step="1" inputmode="numeric" placeholder="90">
+                  </div>
+                  <div class="campo">
+                    <label for="orden-garantia-km">Garantía (km)</label>
+                    <input type="number" id="orden-garantia-km" min="0" step="1" inputmode="numeric" placeholder="5000">
+                  </div>
+                  <div class="campo">
+                    <label for="orden-proximo-fecha">Próximo servicio (fecha)</label>
+                    <input type="date" id="orden-proximo-fecha">
+                  </div>
+                  <div class="campo">
+                    <label for="orden-proximo-km">Próximo servicio (km)</label>
+                    <input type="number" id="orden-proximo-km" min="0" step="1" inputmode="numeric" placeholder="90400">
+                  </div>
+                  <div class="campo campo-span-2">
+                    <label for="orden-proximo-desc">Descripción del próximo servicio</label>
+                    <input type="text" id="orden-proximo-desc" maxlength="120" placeholder="Ej.: Cambio de aceite y filtro">
+                  </div>
+                </div>
+
+                <div class="subseccion-trabajo">
+                  <div class="subseccion-cabecera">
+                    <h4>Repuestos usados</h4>
+                    <button type="button" class="btn btn-secundario btn-sm" id="btn-agregar-repuesto">＋ Agregar repuesto</button>
+                  </div>
+                  <div class="tabla-servicios-contenedor">
+                    <table class="tabla-servicios tabla-repuestos">
+                      <thead>
+                        <tr>
+                          <th>Nombre del repuesto</th>
+                          <th class="columna-cantidad">Cantidad</th>
+                          <th class="columna-quitar"><span class="solo-lectores">Quitar</span></th>
+                        </tr>
+                      </thead>
+                      <tbody id="cuerpo-repuestos"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="subseccion-trabajo">
+                  <div class="subseccion-cabecera">
+                    <h4>Recomendaciones para la próxima visita</h4>
+                    <button type="button" class="btn btn-secundario btn-sm" id="btn-agregar-recomendacion">＋ Agregar recomendación</button>
+                  </div>
+                  <div class="lista-recomendaciones-form" id="lista-recomendaciones-form"></div>
+                </div>
+              </section>
+
+              <section class="tarjeta form-seccion" aria-labelledby="titulo-estado">
+                <div class="form-seccion-cabecera">
+                  <span class="form-seccion-numero">06</span>
                   <div>
                     <h3 id="titulo-estado">Estado del proceso</h3>
                     <p>Actualizá la etapa en la que se encuentra el vehículo.</p>
@@ -438,7 +541,7 @@
 
               <section class="tarjeta form-seccion" aria-labelledby="titulo-fotos">
                 <div class="form-seccion-cabecera">
-                  <span class="form-seccion-numero">06</span>
+                  <span class="form-seccion-numero">07</span>
                   <div>
                     <h3 id="titulo-fotos">Fotos de recepción</h3>
                     <p>Registrá el estado del vehículo al ingresar. Las imágenes se comprimen automáticamente.</p>
@@ -458,7 +561,7 @@
 
               <section class="tarjeta form-seccion" aria-labelledby="titulo-notas">
                 <div class="form-seccion-cabecera">
-                  <span class="form-seccion-numero">07</span>
+                  <span class="form-seccion-numero">08</span>
                   <div>
                     <h3 id="titulo-notas">Notas internas</h3>
                     <p>Observaciones para el equipo del taller. No se muestran en el portal del cliente.</p>
@@ -482,6 +585,175 @@
               </div>
             </form>
           </div>
+        </section>
+
+        <!-- ============================================================
+             VISTA CLIENTES Y VEHÍCULOS
+             ============================================================ -->
+        <section id="vista-clientes" class="vista oculta" aria-label="Clientes y vehículos">
+          <div id="clientes-listado">
+            <div class="seccion-cabecera">
+              <div>
+                <p class="seccion-etiqueta">Relaciones y vehículos</p>
+                <h2>Clientes</h2>
+                <p class="seccion-descripcion">Fichas de clientes, carnet de cada vehículo y todo su historial de servicios.</p>
+              </div>
+              <div class="ficha-acciones">
+                <button type="button" class="btn btn-secundario" id="btn-nuevo-vehiculo">
+                  <span aria-hidden="true">＋</span> Nuevo vehículo
+                </button>
+                <button type="button" class="btn btn-primario" id="btn-nuevo-cliente">
+                  <span aria-hidden="true">＋</span> Nuevo cliente
+                </button>
+              </div>
+            </div>
+
+            <div id="clientes-resumen" class="clientes-resumen"></div>
+
+            <div class="tarjeta barra-filtros clientes-barra">
+              <div class="campo-busqueda">
+                <span class="campo-busqueda-icono" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+                <label class="solo-lectores" for="buscar-clientes">Buscar clientes o vehículos</label>
+                <input type="search" id="buscar-clientes" placeholder="Buscar por nombre, NIT, celular o placa…" autocomplete="off">
+              </div>
+              <div class="selector-vista" role="group" aria-label="Ver clientes o vehículos">
+                <button type="button" class="vista-btn activo" data-modo-listado="clientes">Clientes</button>
+                <button type="button" class="vista-btn" data-modo-listado="vehiculos">Vehículos</button>
+              </div>
+              <span class="conteo-resultados" id="clientes-conteo"></span>
+            </div>
+
+            <div id="clientes-tabla" class="tarjeta tabla-contenedor"></div>
+          </div>
+
+          <div id="clientes-ficha" class="oculto"></div>
+          <div id="vehiculo-ficha" class="oculto"></div>
+        </section>
+
+        <!-- ============================================================
+             VISTA HISTORIAL GENERAL DE TRABAJOS
+             ============================================================ -->
+        <section id="vista-historial" class="vista oculta" aria-label="Historial general de trabajos">
+          <div class="seccion-cabecera">
+            <div>
+              <p class="seccion-etiqueta">Operación</p>
+              <h2>Historial general de trabajos</h2>
+              <p class="seccion-descripcion">Todas las visitas entregadas, con filtros, totales y exportación a CSV.</p>
+            </div>
+            <div class="ficha-acciones">
+              <button type="button" class="btn btn-secundario" id="btn-limpiar-historial">Limpiar filtros</button>
+              <button type="button" class="btn btn-primario" id="btn-exportar-csv-historial">
+                <span aria-hidden="true">↓</span> Exportar CSV
+              </button>
+            </div>
+          </div>
+
+          <div id="historial-estadisticas" class="historial-estadisticas" aria-label="Resumen estadístico del taller"></div>
+
+          <div class="tarjeta barra-filtros historial-filtros">
+            <div class="campo-busqueda historial-busqueda">
+              <span class="campo-busqueda-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <label class="solo-lectores" for="historial-buscar">Buscar por placa, cliente o ficha</label>
+              <input type="search" id="historial-buscar" placeholder="Buscar placa, cliente o N° de ficha…" autocomplete="off">
+            </div>
+            <div class="campo">
+              <label for="historial-desde">Desde</label>
+              <input type="date" id="historial-desde">
+            </div>
+            <div class="campo">
+              <label for="historial-hasta">Hasta</label>
+              <input type="date" id="historial-hasta">
+            </div>
+            <div class="campo">
+              <label for="historial-marca">Marca</label>
+              <select id="historial-marca"><option value="">Todas</option></select>
+            </div>
+            <div class="campo">
+              <label for="historial-modelo">Modelo</label>
+              <select id="historial-modelo"><option value="">Todos</option></select>
+            </div>
+            <div class="campo">
+              <label for="historial-categoria">Categoría</label>
+              <select id="historial-categoria">
+                <option value="">Todas</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="reparacion">Reparación</option>
+                <option value="diagnostico">Diagnóstico</option>
+                <option value="carroceria_pintura">Carrocería y pintura</option>
+                <option value="electricidad">Electricidad</option>
+                <option value="neumaticos">Neumáticos</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="historial-mecanico">Mecánico</label>
+              <select id="historial-mecanico"><option value="">Todos</option></select>
+            </div>
+            <div class="campo">
+              <label for="historial-pago">Forma de pago</label>
+              <select id="historial-pago">
+                <option value="">Todas</option>
+                <option value="contado">Contado</option>
+                <option value="credito">Crédito</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="historial-servicio">Servicio específico</label>
+              <select id="historial-servicio"><option value="">Todos</option></select>
+            </div>
+          </div>
+
+          <div class="tarjeta historial-tabla-tarjeta">
+            <div class="historial-tabla-cabecera">
+              <h3>Trabajos realizados</h3>
+              <span class="conteo-resultados" id="historial-conteo">Sin registros</span>
+            </div>
+            <div class="tabla-contenedor">
+              <table class="tabla-historial" id="tabla-historial">
+                <thead>
+                  <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Ficha</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Vehículo</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Mecánico</th>
+                    <th scope="col">Servicios</th>
+                    <th scope="col">Pago</th>
+                    <th scope="col" class="der">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-historial-general"></tbody>
+              </table>
+            </div>
+            <div id="historial-vacio" class="estado-vacio oculto">
+              <h3>No hay trabajos que coincidan</h3>
+              <p>Probá ampliar el rango de fechas o limpiar los filtros.</p>
+            </div>
+            <div class="historial-pie">
+              <div id="historial-totales" class="historial-totales" aria-live="polite"></div>
+              <nav id="historial-paginacion" class="paginacion" aria-label="Paginación del historial"></nav>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             VISTA RECORDATORIOS DE MANTENIMIENTO
+             ============================================================ -->
+        <section id="vista-recordatorios" class="vista oculta" aria-label="Recordatorios de mantenimiento">
+          <div class="seccion-cabecera">
+            <div>
+              <p class="seccion-etiqueta">Seguimiento</p>
+              <h2>Recordatorios de mantenimiento</h2>
+              <p class="seccion-descripcion">Servicios vencidos y próximos, garantías por vencer y recomendaciones pendientes.</p>
+            </div>
+            <span class="chip-recordatorios" id="recordatorios-resumen"></span>
+          </div>
+          <div id="recordatorios-panel" class="recordatorios-panel"></div>
         </section>
       </main>
     </div>
@@ -685,6 +957,193 @@
   </div>
 
   <!-- ============================================================
+       MODAL: CLIENTE
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-cliente" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-cliente-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Clientes</span>
+          <h2 id="modal-cliente-titulo">Nuevo cliente</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <form id="form-cliente" novalidate>
+        <input type="hidden" id="cli-id" value="">
+        <div class="modal-cuerpo">
+          <div class="grid-campos grid-2">
+            <div class="campo campo-span-2">
+              <label for="cli-nombre">Nombre y apellido o razón social <span class="obligatorio">*</span></label>
+              <input type="text" id="cli-nombre" maxlength="120" autocomplete="name" required>
+            </div>
+            <div class="campo">
+              <label for="cli-nit">NIT / CI</label>
+              <input type="text" id="cli-nit" maxlength="20" inputmode="numeric">
+            </div>
+            <div class="campo">
+              <label for="cli-celular">Celular <span class="obligatorio">*</span></label>
+              <input type="tel" id="cli-celular" maxlength="20" autocomplete="tel" required>
+            </div>
+            <div class="campo">
+              <label for="cli-telefono">Teléfono fijo</label>
+              <input type="tel" id="cli-telefono" maxlength="20">
+            </div>
+            <div class="campo">
+              <label for="cli-email">Email</label>
+              <input type="email" id="cli-email" maxlength="80" autocomplete="email">
+            </div>
+            <div class="campo campo-span-2">
+              <label for="cli-direccion">Dirección</label>
+              <input type="text" id="cli-direccion" maxlength="160" autocomplete="street-address">
+            </div>
+            <div class="campo campo-span-2">
+              <label for="cli-notas">Notas</label>
+              <textarea id="cli-notas" rows="3" maxlength="500" placeholder="Preferencias de contacto, condiciones de pago…"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar-modal>Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: VEHÍCULO
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-vehiculo" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-vehiculo-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Vehículos</span>
+          <h2 id="modal-vehiculo-titulo">Nuevo vehículo</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <form id="form-vehiculo" novalidate>
+        <input type="hidden" id="veh-id" value="">
+        <div class="modal-cuerpo">
+          <div class="grid-campos grid-2">
+            <div class="campo campo-span-2">
+              <label for="veh-id-cliente">Dueño actual <span class="obligatorio">*</span></label>
+              <select id="veh-id-cliente" required></select>
+              <p class="ayuda-campo">Si la placa ya existe con otro cliente, se pedirá confirmación para reasignarla.</p>
+            </div>
+          </div>
+          <div class="grid-campos grid-4">
+            <div class="campo">
+              <label for="veh-placa">Placa <span class="obligatorio">*</span></label>
+              <input type="text" id="veh-placa" maxlength="12" class="campo-placa" required>
+            </div>
+            <div class="campo">
+              <label for="veh-marca">Marca <span class="obligatorio">*</span></label>
+              <input type="text" id="veh-marca" maxlength="40" required>
+            </div>
+            <div class="campo">
+              <label for="veh-modelo">Modelo <span class="obligatorio">*</span></label>
+              <input type="text" id="veh-modelo" maxlength="40" required>
+            </div>
+            <div class="campo">
+              <label for="veh-tipo">Tipo</label>
+              <select id="veh-tipo">
+                <option value="Sedán">Sedán</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="SUV">SUV</option>
+                <option value="Camioneta">Camioneta</option>
+                <option value="Furgoneta">Furgoneta</option>
+                <option value="Camión">Camión</option>
+                <option value="Motocicleta">Motocicleta</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="veh-anio">Año</label>
+              <input type="number" id="veh-anio" min="1950" max="2100" step="1" inputmode="numeric">
+            </div>
+            <div class="campo">
+              <label for="veh-color">Color</label>
+              <input type="text" id="veh-color" maxlength="30">
+            </div>
+            <div class="campo">
+              <label for="veh-kilometraje">Kilometraje actual</label>
+              <input type="number" id="veh-kilometraje" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="campo">
+              <label for="veh-bateria">Batería</label>
+              <input type="text" id="veh-bateria" maxlength="80" placeholder="Marca, amperaje y estado">
+            </div>
+            <div class="campo campo-span-2">
+              <label for="veh-motor">N° de motor</label>
+              <input type="text" id="veh-motor" maxlength="40">
+            </div>
+            <div class="campo campo-span-2">
+              <label for="veh-vin">VIN / chasis</label>
+              <input type="text" id="veh-vin" maxlength="40">
+            </div>
+            <div class="campo campo-span-4">
+              <label for="veh-notas">Notas</label>
+              <textarea id="veh-notas" rows="2" maxlength="500"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-pie">
+          <button type="button" class="btn btn-secundario" data-cerrar-modal>Cancelar</button>
+          <button type="submit" class="btn btn-primario">Guardar vehículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: HISTORIAL RÁPIDO DEL VEHÍCULO
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-historial-rapido" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-historial-rapido-titulo">
+    <div class="modal modal-ancho">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Vehículo conocido</span>
+          <h2 id="modal-historial-rapido-titulo">Historial del vehículo</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo" id="historial-rapido-contenido"></div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" data-cerrar-modal>Cerrar</button>
+        <button type="button" class="btn btn-primario" id="btn-historial-completo">Ver carnet completo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: RECORDATORIO POR WHATSAPP
+       ============================================================ -->
+  <div class="modal-fondo" id="modal-recordatorio" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-recordatorio-titulo">
+    <div class="modal">
+      <div class="modal-cabecera">
+        <div>
+          <span class="modal-etiqueta">Seguimiento</span>
+          <h2 id="modal-recordatorio-titulo">Enviar recordatorio</h2>
+        </div>
+        <button type="button" class="btn-icono" data-cerrar-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="texto-suave" id="recordatorio-destino"></p>
+        <div class="campo">
+          <label for="recordatorio-mensaje">Mensaje de WhatsApp</label>
+          <textarea id="recordatorio-mensaje" rows="6" maxlength="800"></textarea>
+          <p class="ayuda-campo">Podés editar el mensaje antes de abrir WhatsApp.</p>
+        </div>
+      </div>
+      <div class="modal-pie">
+        <button type="button" class="btn btn-secundario" data-cerrar-modal>Cancelar</button>
+        <button type="button" class="btn btn-primario" id="btn-enviar-recordatorio">Abrir WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
        MODAL: CONFIRMACIÓN
        ============================================================ -->
   <div class="modal-fondo" id="modal-confirmar" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirmar-titulo">
@@ -722,12 +1181,19 @@
     </div>
   </div>
 
-  <script src="js/utilidades.js?v=2"></script>
-  <script src="js/almacen.js?v=2"></script>
-  <script src="js/datos-demo.js?v=2"></script>
-  <script src="js/agenda.js?v=2"></script>
-  <script src="js/ordenes.js?v=2"></script>
-  <script src="js/whatsapp.js?v=2"></script>
+  <!-- Sugerencias del formulario de órdenes (clientes y vehículos) -->
+  <div id="autocompletar-orden" class="autocompletar-panel oculto" role="listbox" aria-label="Sugerencias de clientes y vehículos"></div>
+  <datalist id="lista-servicios"></datalist>
+
+  <script src="js/utilidades.js?v=20"></script>
+  <script src="js/almacen.js?v=20"></script>
+  <script src="js/datos-demo.js?v=20"></script>
+  <script src="js/historial.js?v=20"></script>
+  <script src="js/recordatorios.js?v=20"></script>
+  <script src="js/clientes.js?v=20"></script>
+  <script src="js/agenda.js?v=20"></script>
+  <script src="js/ordenes.js?v=20"></script>
+  <script src="js/whatsapp.js?v=20"></script>
   <script>
     /* =========================================================
        ARRANQUE DE LA APLICACIÓN INTERNA
@@ -738,16 +1204,28 @@
 
       const titulos = {
         agenda: { titulo: 'Agenda del taller', miga: 'Operación / Agenda' },
-        ordenes: { titulo: 'Órdenes de trabajo', miga: 'Operación / Órdenes de trabajo' }
+        ordenes: { titulo: 'Órdenes de trabajo', miga: 'Operación / Órdenes de trabajo' },
+        clientes: { titulo: 'Clientes y vehículos', miga: 'Relaciones / Clientes' },
+        historial: { titulo: 'Historial de trabajos', miga: 'Operación / Historial' },
+        recordatorios: { titulo: 'Recordatorios de mantenimiento', miga: 'Seguimiento / Recordatorios' }
       };
 
       function actualizarContadoresApp() {
         const eventos = Almacen.obtenerEventos();
         const ordenes = Almacen.obtenerOrdenes();
+        const clientes = Almacen.obtenerClientes();
         const badgeEventos = document.getElementById('nav-badge-eventos');
         const badgeOrdenes = document.getElementById('nav-badge-ordenes');
+        const badgeClientes = document.getElementById('nav-badge-clientes');
+        const badgeHistorial = document.getElementById('nav-badge-historial');
+        const badgeRecordatorios = document.getElementById('nav-badge-recordatorios');
         if (badgeEventos) badgeEventos.textContent = String(eventos.length);
         if (badgeOrdenes) badgeOrdenes.textContent = String(ordenes.length);
+        if (badgeClientes) badgeClientes.textContent = String(clientes.length);
+        if (badgeHistorial) badgeHistorial.textContent = String(Almacen.obtenerHistorial().length);
+        if (badgeRecordatorios) {
+          badgeRecordatorios.textContent = String(window.Recordatorios ? Recordatorios.contar() : 0);
+        }
       }
 
       function cerrarMenuMovil() {
@@ -771,6 +1249,15 @@
         if (nombre === 'agenda' && window.Agenda && typeof Agenda.recargar === 'function') {
           Agenda.recargar();
         }
+        if (nombre === 'clientes' && window.Clientes && typeof Clientes.mostrarListado === 'function') {
+          Clientes.mostrarListado();
+        }
+        if (nombre === 'historial' && window.Historial && typeof Historial.mostrarGeneral === 'function') {
+          Historial.mostrarGeneral();
+        }
+        if (nombre === 'recordatorios' && window.Recordatorios && typeof Recordatorios.mostrar === 'function') {
+          Recordatorios.mostrar();
+        }
         cerrarMenuMovil();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -784,6 +1271,9 @@
       window.recargarAplicacion = () => {
         if (window.Agenda) Agenda.recargar();
         if (window.Ordenes) Ordenes.recargar();
+        if (window.Clientes) Clientes.recargar();
+        if (window.Historial && typeof Historial.recargarGeneral === 'function') Historial.recargarGeneral();
+        if (window.Recordatorios) Recordatorios.recargar();
         actualizarContadoresApp();
       };
 
@@ -871,6 +1361,9 @@
 
       if (window.Agenda) Agenda.iniciar();
       if (window.Ordenes) Ordenes.iniciar();
+      if (window.Clientes) Clientes.iniciar();
+      if (window.Historial && typeof Historial.iniciarGeneral === 'function') Historial.iniciarGeneral();
+      if (window.Recordatorios) Recordatorios.iniciar();
       mostrarVista('agenda');
     });
   </script>

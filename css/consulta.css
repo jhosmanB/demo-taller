@@ -503,6 +503,223 @@ textarea:disabled {
   border-top: 1px dashed var(--gris-200);
 }
 
+/* Historial del vehículo */
+.portal-historial-resumen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.portal-historial-mantenimiento {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 13px;
+  border: 1px solid var(--gris-200);
+  border-left: 4px solid var(--gris-300);
+  border-radius: 8px;
+  background: var(--gris-50);
+}
+
+.portal-historial-mantenimiento-vencido {
+  border-left-color: var(--rojo);
+  background: var(--rojo-claro);
+}
+
+.portal-historial-mantenimiento-proximo {
+  border-left-color: #F59E0B;
+  background: #FFFBEB;
+}
+
+.portal-historial-mantenimiento-al-dia {
+  border-left-color: var(--verde);
+  background: #F0FDF4;
+}
+
+.portal-historial-mini-etiqueta {
+  color: var(--texto-suave);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+}
+
+.portal-historial-mantenimiento strong {
+  color: var(--carbon-800);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.portal-historial-chip {
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.portal-historial-chip-vencido {
+  background: var(--rojo);
+  color: #fff;
+}
+
+.portal-historial-chip-proximo {
+  background: var(--amarillo);
+  color: #78350F;
+}
+
+.portal-historial-chip-al-dia {
+  background: var(--verde);
+  color: #fff;
+}
+
+.portal-historial-garantias {
+  padding: 11px 13px;
+  border: 1px solid var(--gris-200);
+  border-radius: 8px;
+  background: var(--gris-50);
+}
+
+.portal-historial-garantias-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portal-historial-garantias-lista li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.portal-historial-garantias-lista strong {
+  color: var(--carbon-800);
+  font-size: 11.5px;
+}
+
+.portal-historial-garantias-lista span,
+.portal-historial-sin-garantias {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 10px;
+}
+
+.portal-historial-sin-garantias {
+  margin-top: 5px;
+}
+
+.portal-historial-lista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--gris-200);
+  list-style: none;
+}
+
+.portal-historial-item {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 11px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gris-100);
+}
+
+.portal-historial-item-fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portal-historial-item-fecha strong {
+  color: var(--carbon-900);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.portal-historial-item-fecha span {
+  color: var(--gris-400);
+  font-size: 10px;
+}
+
+.portal-historial-item-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.portal-historial-item-cabecera span {
+  color: var(--texto-suave);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.45px;
+  text-transform: uppercase;
+}
+
+.portal-historial-item-cabecera strong {
+  color: var(--carbon-900);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.portal-historial-servicios {
+  margin: 4px 0 0;
+  padding-left: 15px;
+  color: var(--carbon-800);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.portal-historial-item-garantia {
+  margin: 5px 0 0;
+  color: var(--verde);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.portal-historial-mas {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.portal-historial-vacio {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--gris-300);
+  border-radius: 8px;
+  background: var(--gris-50);
+  color: var(--texto-suave);
+  font-size: 11.5px;
+  text-align: center;
+}
+
+@media (min-width: 560px) {
+  .portal-historial-resumen {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .portal-historial-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .portal-historial-item-fecha {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+  }
+}
+
 /* Fotos */
 .portal-galeria {
   display: grid;

@@ -780,7 +780,8 @@ const Agenda = (() => {
       titulo = '',
       idOrden = '',
       cliente = '',
-      placa = ''
+      placa = '',
+      notas = ''
     } = opciones;
 
     estado.eventoEnEdicion = evento ? evento.id : null;
@@ -812,7 +813,7 @@ const Agenda = (() => {
       elementos.eventoHoraFin.value = horaFin;
       elementos.eventoCliente.value = cliente;
       elementos.eventoPlaca.value = placa;
-      elementos.eventoNotas.value = '';
+      elementos.eventoNotas.value = notas;
       cargarOpcionesOrdenes(idOrden);
     }
 
@@ -1061,11 +1062,33 @@ const Agenda = (() => {
     }, 60000);
   }
 
+  function agendarCita(opciones = {}) {
+    const {
+      cliente = '',
+      placa = '',
+      titulo = '',
+      notas = '',
+      tipo = 'recepcion'
+    } = opciones;
+    const manana = sumarDias(new Date(), 1);
+    abrirFormularioEvento({
+      fecha: aISOfecha(manana),
+      horaInicio: '09:00',
+      horaFin: '10:00',
+      tipo,
+      titulo: titulo || 'Cita en el taller',
+      cliente,
+      placa,
+      notas
+    });
+  }
+
   return {
     iniciar,
     recargar,
     abrirEvento: abrirDetalleEvento,
     programarEntrega,
+    agendarCita,
     irAOrden
   };
 })();

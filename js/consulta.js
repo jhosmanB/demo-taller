@@ -17,6 +17,9 @@ const Consulta = (() => {
     orden: null,
     origen: 'local',
     fotos: [],
+    historial: [],
+    historialVisibles: 10,
+    kmActual: 0,
     bloqueadoHasta: 0,
     temporizador: null
   };
@@ -64,6 +67,8 @@ const Consulta = (() => {
     if (telefono) {
       telefono.href = enlaceWhatsApp;
       telefono.title = `WhatsApp ${CONFIG.telefonoVisible}`;
+      /* El nombre accesible debe incluir el texto visible del enlace. */
+      telefono.setAttribute('aria-label', `Contactar al taller por WhatsApp ${CONFIG.telefonoVisible}`);
     }
 
     const telefonoTexto = document.getElementById('portal-telefono-texto');
@@ -101,6 +106,10 @@ const Consulta = (() => {
       }
       if (evento.target.closest('#btn-nueva-consulta')) {
         nuevaConsulta();
+      }
+      if (evento.target.closest('#btn-mas-historial')) {
+        estado.historialVisibles += 10;
+        actualizarHistorialPortal();
       }
     });
   }
@@ -375,6 +384,182 @@ const Consulta = (() => {
     return { cliente, vehiculo, servicios, total };
   }
 
+  /* ---------------------------------------------------------
+     Historial del vehículo en el portal
+     --------------------------------------------------------- */
+  function normalizarHistorialPortal(registros) {
+    return (Array.isArray(registros) ? registros : [])
+      .map((registro) => {
+        if (!registro || typeof registro !== 'object') return null;
+        const garantia = registro.garantia && typeof registro.garantia === 'object' ? registro.garantia : {};
+        const proximo = registro.proximo_servicio && typeof registro.proximo_servicio === 'object'
+          ? registro.proximo_servicio
+          : {};
+        return {
+          fecha: registro.fecha || registro.fecha_entrega || registro.fecha_ingreso || '',
+          kilometraje: Number(registro.kilometraje) || 0,
+          servicios: (Array.isArray(registro.servicios) ? registro.servicios : [])
+            .map((servicio) => ({
+              nombre: servicio?.nombre || '',
+              importe: Number(servicio?.importe) || 0
+            }))
+            .filter((servicio) => servicio.nombre),
+          total: Number(registro.total) || 0,
+          garantia: {
+            dias: Number(garantia.dias) || 0,
+            km: Number(garantia.km) || 0,
+            vence: garantia.vence || ''
+          },
+          proximo_servicio: {
+            fecha: proximo.fecha || '',
+            km: Number(proximo.km) || 0,
+            descripcion: proximo.descripcion || ''
+          }
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+  }
+
+  function vehiculoDelHistorial(orden, origen) {
+    if (origen === 'hash') return null;
+    if (orden.id_vehiculo && Almacen.obtenerVehiculo(orden.id_vehiculo)) {
+      return Almacen.obtenerVehiculo(orden.id_vehiculo);
+    }
+    return Almacen.obtenerVehiculoPorPlaca(orden.vehiculo?.placa || orden.placa || '');
+  }
+
+  function historialDelVehiculo(orden, origen) {
+    if (origen === 'hash') return normalizarHistorialPortal(orden.historial);
+    const vehiculo = vehiculoDelHistorial(orden, origen);
+    return normalizarHistorialPortal(vehiculo ? Almacen.obtenerHistorialVehiculo(vehiculo.id) : []);
+  }
+
+  function estadoMantenimientoPortal(historial, kmActual) {
+    const hoy = inicioDelDia(new Date());
+    const limite = sumarDias(hoy, 30);
+    const registroConProximo = historial.find((registro) => (
+      registro.proximo_servicio
+      && (registro.proximo_servicio.fecha || Number(registro.proximo_servicio.km) > 0)
+    ));
+
+    let proximo = null;
+    if (registroConProximo) {
+      const datos = registroConProximo.proximo_servicio;
+      const fecha = parsearFechaHora(datos.fecha);
+      const km = Number(datos.km) || 0;
+      const vencidoFecha = Boolean(fecha) && inicioDelDia(fecha) < hoy;
+      const vencidoKm = km > 0 && kmActual > 0 && kmActual >= km;
+      const cercaFecha = Boolean(fecha) && !vencidoFecha && inicioDelDia(fecha) <= limite;
+      const cercaKm = km > 0 && kmActual > 0 && !vencidoKm && (km - kmActual) <= 500;
+      const clase = vencidoFecha || vencidoKm
+        ? 'vencido'
+        : cercaFecha || cercaKm
+          ? 'proximo'
+          : 'al-dia';
+      const etiqueta = clase === 'vencido' ? 'Vencido' : clase === 'proximo' ? 'Próximo' : 'Al día';
+      const detalle = [
+        datos.descripcion || 'Mantenimiento programado',
+        datos.fecha ? formatearFecha(datos.fecha) : '',
+        km > 0 ? `a los ${km.toLocaleString('es-BO')} km` : ''
+      ].filter(Boolean).join(' · ');
+      proximo = { clase, etiqueta, detalle };
+    }
+
+    const garantias = historial.filter((registro) => {
+      const vence = parsearFechaHora(registro.garantia?.vence);
+      return Boolean(vence) && inicioDelDia(vence) >= hoy;
+    });
+
+    return { proximo, garantias };
+  }
+
+  function garantiasPortalHTML(garantias) {
+    if (!garantias.length) return '<p class="portal-historial-sin-garantias">Sin garantías vigentes.</p>';
+    return `
+      <ul class="portal-historial-garantias-lista">
+        ${garantias.map((registro) => {
+          const garantia = registro.garantia;
+          const cobertura = [
+            garantia.dias > 0 ? `${garantia.dias} días` : '',
+            garantia.km > 0 ? `${garantia.km.toLocaleString('es-BO')} km` : ''
+          ].filter(Boolean).join(' · ');
+          return `
+            <li>
+              <strong>Vigente hasta ${escaparHTML(formatearFecha(garantia.vence))}</strong>
+              <span>Visita del ${escaparHTML(formatearFecha(registro.fecha))}${cobertura ? ` · ${escaparHTML(cobertura)}` : ''}</span>
+            </li>
+          `;
+        }).join('')}
+      </ul>
+    `;
+  }
+
+  function historialPortalHTML(historial, visibles, kmActual) {
+    if (!historial.length) {
+      return `
+        <p class="portal-historial-vacio">
+          Todavía no hay visitas registradas para este vehículo. Cuando el taller entregue un trabajo, aparecerá acá.
+        </p>
+      `;
+    }
+
+    const { proximo, garantias } = estadoMantenimientoPortal(historial, kmActual);
+    const mostrados = historial.slice(0, visibles);
+    const restantes = Math.max(0, historial.length - mostrados.length);
+
+    return `
+      <div class="portal-historial-resumen">
+        <div class="portal-historial-mantenimiento portal-historial-mantenimiento-${proximo ? proximo.clase : 'sin-datos'}">
+          <span class="portal-historial-mini-etiqueta">Próximo mantenimiento</span>
+          <strong>${escaparHTML(proximo ? proximo.detalle : 'Sin próximo servicio programado')}</strong>
+          ${proximo ? `<span class="portal-historial-chip portal-historial-chip-${proximo.clase}">${escaparHTML(proximo.etiqueta)}</span>` : ''}
+        </div>
+        <div class="portal-historial-garantias">
+          <span class="portal-historial-mini-etiqueta">Garantías vigentes</span>
+          ${garantiasPortalHTML(garantias)}
+        </div>
+      </div>
+
+      <ol class="portal-historial-lista">
+        ${mostrados.map((registro) => `
+          <li class="portal-historial-item">
+            <div class="portal-historial-item-fecha">
+              <strong>${escaparHTML(formatearFecha(registro.fecha))}</strong>
+              <span>${registro.kilometraje ? escaparHTML(formatearKilometraje(registro.kilometraje)) : 'Sin km'}</span>
+            </div>
+            <div class="portal-historial-item-cuerpo">
+              <div class="portal-historial-item-cabecera">
+                <span>${registro.servicios.length} ${registro.servicios.length === 1 ? 'servicio' : 'servicios'}</span>
+                <strong>${formatearMoneda(registro.total)}</strong>
+              </div>
+              <ul class="portal-historial-servicios">
+                ${registro.servicios.length
+                  ? registro.servicios.map((servicio) => `<li>${escaparHTML(servicio.nombre)}</li>`).join('')
+                  : '<li>Sin servicios registrados</li>'}
+              </ul>
+              ${registro.garantia.vence
+                ? `<p class="portal-historial-item-garantia">Garantía hasta ${escaparHTML(formatearFecha(registro.garantia.vence))}</p>`
+                : ''}
+            </div>
+          </li>
+        `).join('')}
+      </ol>
+
+      ${restantes ? `
+        <button type="button" class="btn btn-secundario portal-historial-mas" id="btn-mas-historial">
+          Ver ${Math.min(10, restantes)} ${Math.min(10, restantes) === 1 ? 'visita más' : 'visitas más'}
+        </button>
+      ` : ''}
+    `;
+  }
+
+  function actualizarHistorialPortal() {
+    const contenedor = document.getElementById('portal-historial-contenido');
+    if (!contenedor) return;
+    contenedor.innerHTML = historialPortalHTML(estado.historial, estado.historialVisibles, estado.kmActual);
+  }
+
   function renderizarResultado(orden, origen) {
     if (!elementos.resultado) return;
 
@@ -382,6 +567,9 @@ const Consulta = (() => {
     const datos = normalizarOrden(orden);
     const { cliente, vehiculo, servicios, total } = datos;
     const estadoOrden = orden.estado || 'recibido';
+    const registroVehiculo = vehiculoDelHistorial(orden, origen);
+    const historial = historialDelVehiculo(orden, origen);
+    const kmActual = Number(registroVehiculo?.kilometraje_actual ?? vehiculo.kilometraje) || 0;
 
     const fotos = origen === 'local' && Array.isArray(orden.fotos)
       ? orden.fotos
@@ -525,6 +713,18 @@ const Consulta = (() => {
           </div>
         </section>
 
+        <section class="tarjeta portal-bloque" aria-labelledby="portal-titulo-historial">
+          <h3 id="portal-titulo-historial">${icono('historial')} Historial de mi vehículo</h3>
+          <p class="portal-bloque-ayuda">
+            ${origen === 'hash'
+              ? 'Resumen de las últimas visitas compartido por el taller.'
+              : 'Visitas entregadas de este vehículo, con kilometraje, servicios y total.'}
+          </p>
+          <div id="portal-historial-contenido">
+            ${historialPortalHTML(historial, 10, kmActual)}
+          </div>
+        </section>
+
         ${galeria}
 
         <div class="portal-acciones">
@@ -546,6 +746,9 @@ const Consulta = (() => {
     estado.orden = ficha;
     estado.origen = origen;
     estado.fotos = fotos;
+    estado.historial = historial;
+    estado.historialVisibles = 10;
+    estado.kmActual = kmActual;
 
     elementos.resultado.classList.remove('oculto');
     setTimeout(() => {
@@ -558,6 +761,9 @@ const Consulta = (() => {
   function nuevaConsulta() {
     estado.orden = null;
     estado.fotos = [];
+    estado.historial = [];
+    estado.historialVisibles = 10;
+    estado.kmActual = 0;
     if (elementos.resultado) {
       elementos.resultado.innerHTML = '';
       elementos.resultado.classList.add('oculto');

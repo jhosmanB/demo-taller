@@ -40,6 +40,42 @@ const WhatsApp = (() => {
    * Resumen que viaja en el hash del link. No incluye fotos,
    * notas internas, número de motor ni VIN.
    */
+  function resumenHistorialVehiculo(orden) {
+    const vehiculo = orden.vehiculo || {};
+    const registroVehiculo = orden.id_vehiculo
+      ? Almacen.obtenerVehiculo(orden.id_vehiculo)
+      : Almacen.obtenerVehiculoPorPlaca(vehiculo.placa);
+    if (!registroVehiculo) return [];
+
+    return Almacen.obtenerHistorialVehiculo(registroVehiculo.id)
+      .slice(0, 5)
+      .map((registro) => {
+        const garantia = registro.garantia && typeof registro.garantia === 'object' ? registro.garantia : {};
+        const proximo = registro.proximo_servicio && typeof registro.proximo_servicio === 'object'
+          ? registro.proximo_servicio
+          : {};
+        return {
+          fecha: registro.fecha_entrega || registro.fecha_ingreso || '',
+          kilometraje: Number(registro.kilometraje) || 0,
+          servicios: (Array.isArray(registro.servicios) ? registro.servicios : []).map((servicio) => ({
+            nombre: servicio?.nombre || '',
+            importe: Number(servicio?.importe) || 0
+          })),
+          total: Number(registro.total) || 0,
+          garantia: {
+            dias: Number(garantia.dias) || 0,
+            km: Number(garantia.km) || 0,
+            vence: garantia.vence || ''
+          },
+          proximo_servicio: {
+            fecha: proximo.fecha || '',
+            km: Number(proximo.km) || 0,
+            descripcion: proximo.descripcion || ''
+          }
+        };
+      });
+  }
+
   function construirResumen(orden) {
     const cliente = orden.cliente || {};
     const vehiculo = orden.vehiculo || {};
@@ -67,7 +103,8 @@ const WhatsApp = (() => {
       forma_pago: orden.forma_pago || '',
       documento: orden.documento || '',
       actualizado_en: orden.actualizado_en || '',
-      entrega_estimada: buscarEntregaEstimada(orden.numero_ficha)
+      entrega_estimada: buscarEntregaEstimada(orden.numero_ficha),
+      historial: resumenHistorialVehiculo(orden)
     };
   }
 

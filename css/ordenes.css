@@ -95,7 +95,7 @@
 .estadistica-datos small {
   margin-top: 2px;
   overflow: hidden;
-  color: var(--gris-400);
+  color: #6B7280;
   font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -222,7 +222,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--naranja-oscuro);
+  color: #C2410C;
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 16px;
   font-weight: 700;
@@ -247,7 +247,7 @@
 .celda-sub {
   display: block;
   margin-top: 1px;
-  color: var(--gris-400);
+  color: #6B7280;
   font-size: 10.5px;
   white-space: nowrap;
 }
@@ -1105,6 +1105,41 @@
   margin: 0;
   color: #374151;
   font-size: 10.5px;
+}
+
+.impreso-recomendaciones {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.impreso-recomendaciones > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #6B7280;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.impreso-recomendaciones ul {
+  margin: 0;
+  padding-left: 16px;
+  color: #374151;
+  font-size: 10.5px;
+}
+
+.impreso-urgencia {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid #D1D5DB;
+  border-radius: 3px;
+  color: #6B7280;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .impreso-fotos {
